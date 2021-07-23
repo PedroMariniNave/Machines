@@ -1,0 +1,43 @@
+Inventory:
+  title: "Máquina - Gerenciar Amigos"
+  size: 54
+  slots: 11,12,13,14,15,20,21,22,23,24
+  next-page-slot: 26 # só vai aparecer se tiver próxima página
+  previous-page-slot: 18 # só vai aparecer se tiver página anterior
+
+Extra-Lore:
+  - ''
+  - '&7Clique para gerenciar esse amigo!'
+
+Nothing:
+  type: COBWEB
+  name: '&cVazio'
+  slot: 22
+
+Back:
+  type: ARROW
+  name: '&cVoltar'
+  slot: 48
+
+Add-Friend:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
+  name: '&aAdicionar Amigo'
+  lore:
+    - '&7Clique para adicionar um amigo'
+    - '&7e gerenciar suas permissões!'
+  slot: 50
+
+Item:
+  type: PLAYER_HEAD
+  owner: "{player}"
+  name: "&a{player}"
+  lore:
+    - '&7Abaixo estão as permissões'
+    - '&7desse amigo:'
+    - ''
+    - ' &8▶ &7Stackar Máquinas: {add_stack}'
+    - ' &8▶ &7Remover Stack: {remove_stack}'
+    - ' &8▶ &7Adicionar Amigos: {add_friends}'
+    - ' &8▶ &7Remover Amigos: {remove_friends}'
+    - ' &8▶ &7Vender Drops: {sell_drops}'

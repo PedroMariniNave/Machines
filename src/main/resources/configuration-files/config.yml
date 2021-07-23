@@ -1,0 +1,127 @@
+MySQL:
+  enabled: false
+  host: 'localhost'
+  database: 'db'
+  username: 'user'
+  password: 'pass'
+  port: 3306
+
+Settings:
+  price:
+    min: 100000
+    max: 500000
+  stack-radius: 5
+  save-interval: 600 # em segundos
+  machine-update: 200 # em ticks
+  tax-remove-stack: 10 # em porcentagem
+  next-update: 0
+  hologram:
+    - '&6&lMÁQUINA DE {type}'
+    - ''
+    - '&7Dono: &f{owner}'
+    - '&7Stack: &f{stack}'
+    - '&7Drops: &f{drops}'
+    - '&7Integridade: &f{integrity}'
+    - '&7Combustível: &f{fuel}'
+    - '&7Status: {status}'
+
+Messages:
+  enabled: '&aLigado'
+  disabled: '&cDesligado'
+  true: '&aSim'
+  false: '&cNão'
+  remove-stack-min: '&6&lVoltz&f&lMC &8&l➜ &cA quantia precisa ser acima de {tax}!'
+  remove-stack-successful: '&6&lVoltz&f&lMC &8&l➜ &7Stacks removidos com sucesso! &f{lost} &7máquinas foram destruídas nesse processo.'
+  incorrect-pickaxe: '&6&lVoltz&f&lMC &8&l➜ &c{lost} máquinas foram destruídas por não ter usado uma ferramenta ideal de remoção!'
+  remove-stack:
+    - '&6&lVoltz&f&lMC &8&l➜ &7Digite no chat quantas máquinas deseja remover!'
+    - ''
+    - '&6&lVoltz&f&lMC &8&l➜ &7Para remover todas, digite `&f*&7`'
+    - '&6&lVoltz&f&lMC &8&l➜ &7Lembre-se que há uma taxa de &f{tax}% &7ao remover stacks!'
+  only-owner: '&6&lVoltz&f&lMC &8&l➜ &cApenas o dono pode gerenciar as permissões!'
+  offline-player: '&6&lVoltz&f&lMC &8&l➜ &cEsse jogador está offline!'
+  invalid-machine: '&6&lVoltz&f&lMC &8&l➜ &cA máquina informada não existe!'
+  invalid-amount: '&6&lVoltz&f&lMC &8&l➜ &cA quantia informada é inválida!'
+  buy-all-zero: '&6&lVoltz&f&lMC &8&l➜ &cVocê não pode comprar nenhuma máquina por falta de coins!'
+  insufficient-money: '&6&lVoltz&f&lMC &8&l➜ &cVocê não possui coins suficientes!'
+  machine-usage: '&6&lVoltz&f&lMC &8&l➜ &cUso correto: /machines give/fuel/pickaxe/repair <jogador> [máquina] <quantia>!'
+  need-permission: '&6&lVoltz&f&lMC &8&l➜ &cVocê não possui permissão para fazer isso!'
+  has-permission: '&6&lVoltz&f&lMC &8&l➜ &cEsse jogador já possui permissões nessa máquina!'
+  machine-permission: '&6&lVoltz&f&lMC &8&l➜ &cVocê não possui permissão para usar essa máquina!'
+  near-machine: '&6&lVoltz&f&lMC &8&l➜ &cHá uma máquina próxima a esse local! Afaste-se e tente novamente.'
+  choose-amount:
+    - '&6&lVoltz&f&lMC &8&l➜ &7Digite no chat quantas máquinas deseja comprar!'
+    - ''
+    - '&6&lVoltz&f&lMC &8&l➜ &7Preço por cada: &e{price}'
+  wait: '&6&lVoltz&f&lMC &8&l➜ &aAdicionando amigo, aguarde...'
+  new-quotation:
+    - ''
+    - '&6&l[Máquinas] &7A cotação mudou! Verifique os novos valores de drops digitando &f/máquinas&7!'
+    - ''
+  add-friend:
+    - '&6&lVoltz&f&lMC &8&l➜ &7Digite no chat o nick do jogador!'
+
+Fuel:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2FmNTliOGFhMGY4MzU0NmVmMGQxNzhjY2Y4N2U3ZWQ4OGNmNzg1OGNhYWU3OWIzNjMzY2JkNzViNjUwNTI1ZiJ9fX0=
+  name: '&6Combustível &7[&f+{amount}&7]'
+  lore:
+    - '&7Use esse combustível para'
+    - '&7abastecer máquinas!'
+
+Pickaxe:
+  type: DIAMOND_PICKAXE
+  name: '&6Toque Suave ∞'
+  glow: true
+  lore:
+    - '&7Use essa picareta para remover'
+    - '&7máquinas sem destruí-las!'
+
+Repair:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWVmNWFjZjEzNGZhOTUyZjEzZmRmMGIzODk5MDYwY2MxOGViYzBhOTcxMzQ3ZTQ1YTMxZWNmOTVhNGIwYjMxYyJ9fX0=
+  name: '&6Reparador de Máquinas &7[&f+{percentage}%&7]'
+  lore:
+    - '&7Use esse item para restaurar'
+    - '&7a integridade de suas máquinas!'
+
+Present:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjBmMjMxNmU0NTVhYzNjM2ZhMmUwZWQ1MmYzMDVjYzRiYzM2M2FiYWZmMTU1M2JiNzE3MGIwZGM4MzY4YWJjMSJ9fX0=
+  name: '&6Presente'
+  lore:
+    - '&7Seja bem-vindo ao servidor!'
+    - '&7Abra esse presente para ver'
+    - '&7o que há dentro!'
+
+Next-Page:
+  type: ARROW
+  name: '&aPróxima Página'
+
+Previous-Page:
+  type: ARROW
+  name: '&cPágina Anterior'
+
+TimeFormatter:
+  second: segundo
+  seconds: segundos
+  minute: minuto
+  minutes: minutos
+  hour: hora
+  hours: horas
+  day: dia
+  days: dias
+  now: agora
+
+NumberFormatter:
+  - "k"
+  - "M"
+  - "B"
+  - "T"
+  - "Q"
+  - "QQ"
+  - "S"
+  - "SS"
+  - "O"
+  - "N"
+  - "D"

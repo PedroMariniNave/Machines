@@ -1,0 +1,26 @@
+Inventory:
+  title: "Máquinas"
+  size: 45
+  slots: 11,12,13,14,15,20,21,22,23,24,29,30,31,32,33
+  next-page-slot: 26 # só vai aparecer se tiver próxima página
+  previous-page-slot: 18 # só vai aparecer se tiver página anterior
+  items:
+    emerald:
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODZhZGRiZDVkZWRhZDQwOTk5NDczYmU0YTdmNDhmNjIzNmE3OWEwZGNlOTcxYjVkYmQ3MzcyMDE0YWUzOTRkIn19fQ==
+      name: '&2Máquina de Esmeralda &7[&fx?&7]'
+      lore:
+        - '&7Preço: &e{price}'
+        - ''
+        - '&7Abaixo estão as informações'
+        - '&7da cotação dos drops!'
+        - ''
+        - ' &8▶ &7Valor atual: &e{drops_now}'
+        - ' &8▶ &7Valor &f24 horas &7atrás: &e{drops_previous}'
+        - ' &8▶ &7Estatística: {statistics}'
+        - ''
+        - '&7Próxima cotação em:'
+        - '&f{update}'
+        - ''
+        - '&7Clique para escolher a quantia!'
+      price: 50000000

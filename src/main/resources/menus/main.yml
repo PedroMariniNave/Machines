@@ -1,0 +1,22 @@
+Inventory:
+  title: "Máquinas"
+  size: 27
+  items:
+    machines:
+      action: OPEN_MACHINES
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmE4N2NkNzUyM2RjYzRjYmVhZWFlYzljOGJlYjg5MmExMDNiOTUzOTVlMDY1ZjI1YmI0ZmM3YTZiZDRiOTAyYyJ9fX0=
+      name: '&6Minhas Máquinas'
+      lore:
+        - '&7Clique para gerenciar'
+        - '&7suas máquinas!'
+      slot: 12
+    shop:
+      action: OPEN_SHOP
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDRkYjI0YTAwYWZkMTFjNTQyYjVmZWVlMDBjN2I0MTZkNzhhNjhiNmYwMzY3YTllMTAyNWYwYTJmY2FkMTNhNiJ9fX0=
+      name: '&6Loja'
+      lore:
+        - '&7Clique para acessar'
+        - '&7a loja de máquinas!'
+      slot: 14

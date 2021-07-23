@@ -1,0 +1,56 @@
+Inventory:
+  title: "Minhas Máquinas"
+  size: 54
+  slots: 11,12,13,14,15,20,21,22,23,24,29,30,31,32,33
+  next-page-slot: 26 # só vai aparecer se tiver próxima página
+  previous-page-slot: 18 # só vai aparecer se tiver página anterior
+
+Nothing:
+  type: COBWEB
+  name: '&cVazio'
+  slot: 22
+
+Enable-All:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
+  name: '&aLigar'
+  lore:
+    - '&7Clique para &fligar &7todas'
+    - '&7suas máquinas!'
+  slot: 48
+
+Sell-All:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmNjN2Y2NDQxYmQ3MWZjOTc0ZTk5NzdiY2IyMmVmYmM0YjYxMjc3YzQ5ZWZiMjQyM2FiOTE1NDg5NWJlIn19fQ==
+  name: '&aVender Drops'
+  lore:
+    - '&7Abaixo estão as informações'
+    - '&7dos drops acumulados!'
+    - ''
+    - ' &8▶ &7Drops acumulados: &f{drops}'
+    - ' &8▶ &7Valor final: &e{price}'
+    - ''
+    - '&7Clique para vender os drops'
+    - '&7de todas suas máquinas!'
+  slot: 49
+
+Disable-All:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZkZTNiZmNlMmQ4Y2I3MjRkZTg1NTZlNWVjMjFiN2YxNWY1ODQ2ODRhYjc4NTIxNGFkZDE2NGJlNzYyNGIifX19
+  name: '&cDesligar'
+  lore:
+    - '&7Clique para &fdesligar &7todas'
+    - '&7suas máquinas!'
+  slot: 50
+
+Item-Lore:
+  - '&7Abaixo estão as informações'
+  - '&7dessa máquina:'
+  - ''
+  - ' &8▶ &7Stack: &f{stack}'
+  - ' &8▶ &7Drops: &f{drops}'
+  - ' &8▶ &7Integridade: &f{integrity}'
+  - ' &8▶ &7Combustível: &f{fuel}'
+  - ' &8▶ &7Status: {status}'
+  - ''
+  - '&7Clique para gerenciar essa máquina!'

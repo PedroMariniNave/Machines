@@ -1,0 +1,11 @@
+name: Machines
+description: Only a simple machines plugin.
+version: 1.0
+api-version: 1.16
+author: zPedroo_
+main: com.zpedroo.voltzmachines.VoltzMachines
+depend: [WorldGuard, HolographicDisplays, Vault, ProtocolLib]
+load: POSTWORLD
+commands:
+  machines:
+    aliases: [machine, maquinas, maquina]

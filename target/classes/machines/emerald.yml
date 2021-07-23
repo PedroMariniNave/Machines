@@ -1,0 +1,89 @@
+Machine-Settings:
+  machine-block: EMERALD_BLOCK
+  type-translated: ESMERALDA
+  display-name: '&2Máquina de Esmeralda'
+  drops:
+    price: 0
+    previous: 0
+    delay: 10
+    amount: 10000
+  max-stack: 100000000
+  commands:
+    - money give {player} {amount}
+  item:
+    type: PLAYER_HEAD
+    owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODZhZGRiZDVkZWRhZDQwOTk5NDczYmU0YTdmNDhmNjIzNmE3OWEwZGNlOTcxYjVkYmQ3MzcyMDE0YWUzOTRkIn19fQ==
+    name: '&7Máquina &8- &2Esmeralda &7[&fx{amount}&7]'
+    lore:
+      - '&7Coloque no seu terreno para'
+      - '&7gerar esmeraldas!'
+      - ''
+      - '&7Integridade: &f{integrity}'
+Machine-Menu:
+  title: Máquina de Esmeralda
+  size: 36
+  items:
+    '1':
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODZhZGRiZDVkZWRhZDQwOTk5NDczYmU0YTdmNDhmNjIzNmE3OWEwZGNlOTcxYjVkYmQ3MzcyMDE0YWUzOTRkIn19fQ==
+      name: '&2Máquina de Esmeralda'
+      lore:
+        - '&7Abaixo estão as informações'
+        - '&7dessa máquina!'
+        - ''
+        - ' &8▶ &7Dono: &f{owner}'
+        - ' &8▶ &7Stack: &f{stack}'
+      slot: 3
+    '2':
+      action: SWITCH
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmE4OTc4Y2NiZjU3NmY0NDZlMjFjNTFkM2U4MGZjN2Y4NTY2ZWI3MjY1Y2M0M2M0YWQ3MWNmYjc4YzE2NTI1NyJ9fX0=
+      name: '&aAlternar Status'
+      lore:
+        - '&7Clique para &fligar&7/&fdesligar'
+        - '&7essa máquina!'
+        - ''
+        - '&7Lembre-se que é necessário colocar'
+        - '&7combustível suficiente para funcionar'
+        - '&7corretamente!'
+      slot: 5
+    '3':
+      action: SELL_DROPS
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmNjN2Y2NDQxYmQ3MWZjOTc0ZTk5NzdiY2IyMmVmYmM0YjYxMjc3YzQ5ZWZiMjQyM2FiOTE1NDg5NWJlIn19fQ==
+      name: '&aVender Drops'
+      lore:
+        - '&7Abaixo estão as informações'
+        - '&7dos drops acumulados!'
+        - ''
+        - ' &8▶ &7Drops acumulados: &f{drops}'
+        - ''
+        - ' &8▶ &7Valor final: &e{price}'
+        - ' &8▶ &7Valor unitário: &e{single_price}'
+        - ''
+        - ' &8▶ &7Valor &f24 horas &7atrás: &e{drops_previous}'
+        - ' &8▶ &7Estatística: {statistics}'
+      slot: 21
+    '4':
+      action: MANAGERS
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDMwOTNhNWI3NzY0MmQ0MDkyMTEyZjQ2ZWE2ODE0MGZiNWFlMDRiYmQyMzFjZGExMDY2YTA0YzE4Yjg5Yzk0ZSJ9fX0=
+      name: '&aGerenciar Amigos'
+      lore:
+        - '&7Clique para gerenciar'
+        - '&7os amigos que possuem'
+        - '&7permissão nessa máquina!'
+      slot: 22
+
+    '5':
+      action: REMOVE_STACK
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2VkMWFiYTczZjYzOWY0YmM0MmJkNDgxOTZjNzE1MTk3YmUyNzEyYzNiOTYyYzk3ZWJmOWU5ZWQ4ZWZhMDI1In19fQ==
+      name: '&aRemover Stack'
+      lore:
+        - '&7Clique para remover'
+        - '&7stacks dessa máquina!'
+        - ''
+        - '&7Há uma taxa de &f10% &7de'
+        - '&7stack nesse processo!'
+      slot: 23
