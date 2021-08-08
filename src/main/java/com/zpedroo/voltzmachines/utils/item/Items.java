@@ -18,16 +18,18 @@ public class Items {
     public static Items getInstance() { return instance; }
 
     private ItemStack fuel;
+    private ItemStack infiniteFuel;
     private ItemStack pickaxe;
     private ItemStack repair;
-    private ItemStack present;
+    private ItemStack gift;
 
     public Items() {
         instance = this;
         this.fuel = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Fuel").build();
+        this.infiniteFuel = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Infinite-Fuel").build();
         this.pickaxe = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Pickaxe").build();
         this.repair = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Repair").build();
-        this.present = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Present").build();
+        this.gift = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Gift").build();
     }
 
     public ItemStack getFuel(BigInteger amount) {
@@ -65,6 +67,13 @@ public class Items {
         }
 
         return item;
+    }
+
+    public ItemStack getInfiniteFuel() {
+        NBTItem nbt = new NBTItem(infiniteFuel.clone());
+        nbt.addCompound("MachinesInfiniteFuel");
+
+        return nbt.getItem();
     }
 
     public ItemStack getPickaxe() {
@@ -111,9 +120,9 @@ public class Items {
         return item;
     }
 
-    public ItemStack getPresent() {
-        NBTItem nbt = new NBTItem(present.clone());
-        nbt.addCompound("MachinesPresent");
+    public ItemStack getGift() {
+        NBTItem nbt = new NBTItem(gift.clone());
+        nbt.addCompound("MachinesGift");
 
         return nbt.getItem();
     }

@@ -10,7 +10,7 @@ Inventory:
       lore:
         - '&7Clique para gerenciar'
         - '&7suas máquinas!'
-      slot: 12
+      slot: 11
     shop:
       action: OPEN_SHOP
       type: PLAYER_HEAD
@@ -19,4 +19,13 @@ Inventory:
       lore:
         - '&7Clique para acessar'
         - '&7a loja de máquinas!'
-      slot: 14
+      slot: 13
+    top:
+      action: OPEN_TOP
+      type: PLAYER_HEAD
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDJmMjQwNWE3YjhkZWZkZGIwYjgyNjhiZWE4ZjJlMTJmYzA5YmJjN2RlMTI5ODFmODVkYjJhNzAwMWFjODFlYiJ9fX0=
+      name: '&6Top Máquinas'
+      lore:
+        - '&7Clique para ver os jogadores'
+        - '&7que mais têm máquinas!'
+      slot: 15

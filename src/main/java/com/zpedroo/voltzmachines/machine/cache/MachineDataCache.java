@@ -4,34 +4,45 @@ import com.zpedroo.voltzmachines.machine.Machine;
 import com.zpedroo.voltzmachines.machine.PlayerMachine;
 import org.bukkit.Location;
 
+import java.math.BigInteger;
 import java.util.*;
 
-public class MachineCacheData {
+public class MachineDataCache {
 
-    private HashMap<String, Machine> machines;
-    private HashMap<Location, PlayerMachine> playerMachines;
+    private Map<String, Machine> machines;
+    private Map<Location, PlayerMachine> playerMachines;
     private Map<UUID, List<PlayerMachine>> playerMachinesByUUID;
+    private Map<UUID, BigInteger> topMachines;
     private Set<Location> deletedMachines;
 
-    public MachineCacheData() {
+    public MachineDataCache() {
         this.machines = new HashMap<>(32);
         this.playerMachines = new HashMap<>(5120);
         this.deletedMachines = new HashSet<>(5120);
         this.playerMachinesByUUID = new HashMap<>(2560);
+        this.topMachines = new HashMap<>(10);
     }
 
-    public HashMap<String, Machine> getMachines() {
+    public Map<String, Machine> getMachines() {
         return machines;
     }
 
-    public HashMap<Location, PlayerMachine> getPlayerMachines() {
+    public Map<Location, PlayerMachine> getPlayerMachines() {
         return playerMachines;
+    }
+
+    public Map<UUID, List<PlayerMachine>> getPlayerMachinesByUUID() {
+        return playerMachinesByUUID;
     }
 
     public List<PlayerMachine> getPlayerMachinesByUUID(UUID uuid) {
         if (!playerMachinesByUUID.containsKey(uuid)) return new ArrayList<>();
 
         return playerMachinesByUUID.get(uuid);
+    }
+
+    public Map<UUID, BigInteger> getTopMachines() {
+        return topMachines;
     }
 
     public Set<Location> getDeletedMachines() {
@@ -44,5 +55,9 @@ public class MachineCacheData {
 
     public void setUUIDMachines(UUID uuid, List<PlayerMachine> machines) {
         this.playerMachinesByUUID.put(uuid, machines);
+    }
+
+    public void setTopMachines(Map<UUID, BigInteger> topMachines) {
+        this.topMachines = topMachines;
     }
 }

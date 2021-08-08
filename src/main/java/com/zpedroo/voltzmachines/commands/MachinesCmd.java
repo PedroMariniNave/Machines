@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.math.BigInteger;
 
@@ -23,11 +24,18 @@ public class MachinesCmd implements CommandExecutor {
         Player target = null;
         BigInteger amount = null;
 
-        if (args.length > 0 && sender.hasPermission("machines.admin")) {
+        if (args.length > 0) {
             String arg = args[0].toUpperCase();
 
             switch (arg) {
+                case "TOP":
+                    if (player == null) return true;
+
+                    Menus.getInstance().openTopMachinesMenu(player);
+                    return true;
                 case "GIVE":
+                    if (!sender.hasPermission("machines.admin")) break;
+
                     if (args.length < 4) {
                         sender.sendMessage(Messages.MACHINE_USAGE);
                         return true;
@@ -57,6 +65,8 @@ public class MachinesCmd implements CommandExecutor {
                     target.getInventory().addItem(machine.getItem(amount, 100));
                     return true;
                 case "FUEL":
+                    if (!sender.hasPermission("machines.admin")) break;
+
                     if (args.length < 3) {
                         sender.sendMessage(Messages.MACHINE_USAGE);
                         return true;
@@ -78,7 +88,38 @@ public class MachinesCmd implements CommandExecutor {
 
                     target.getInventory().addItem(Items.getInstance().getFuel(amount));
                     return true;
+                case "INFINITE":
+                    if (!sender.hasPermission("machines.admin")) break;
+
+                    if (args.length < 3) {
+                        sender.sendMessage(Messages.MACHINE_USAGE);
+                        return true;
+                    }
+
+                    amount = NumberFormatter.getInstance().filter(args[2]);
+
+                    if (amount.signum() <= 0) {
+                        sender.sendMessage(Messages.INVALID_AMOUNT);
+                        return true;
+                    }
+
+                    if (amount.compareTo(BigInteger.valueOf(2304)) > 0) amount = BigInteger.valueOf(2304);
+
+                    target = Bukkit.getPlayer(args[1]);
+
+                    if (target == null) {
+                        sender.sendMessage(Messages.OFFLINE_PLAYER);
+                        return true;
+                    }
+
+                    ItemStack item = Items.getInstance().getInfiniteFuel();
+                    item.setAmount(amount.intValue());
+
+                    target.getInventory().addItem(item);
+                    return true;
                 case "PICKAXE":
+                    if (!sender.hasPermission("machines.admin")) break;
+
                     if (args.length < 3) {
                         sender.sendMessage(Messages.MACHINE_USAGE);
                         return true;
@@ -103,6 +144,8 @@ public class MachinesCmd implements CommandExecutor {
                     }
                     return true;
                 case "REPAIR":
+                    if (!sender.hasPermission("machines.admin")) break;
+
                     if (args.length < 3) {
                         sender.sendMessage(Messages.MACHINE_USAGE);
                         return true;
@@ -124,7 +167,9 @@ public class MachinesCmd implements CommandExecutor {
 
                     target.getInventory().addItem(Items.getInstance().getRepair(percentage.intValue()));
                     return true;
-                case "PRESENT":
+                case "GIFT":
+                    if (!sender.hasPermission("machines.admin")) break;
+
                     if (args.length < 2) {
                         sender.sendMessage(Messages.MACHINE_USAGE);
                         return true;
@@ -137,9 +182,11 @@ public class MachinesCmd implements CommandExecutor {
                         return true;
                     }
 
-                    target.getInventory().addItem(Items.getInstance().getPresent());
+                    target.getInventory().addItem(Items.getInstance().getGift());
                     return true;
                 case "UPDATE":
+                    if (!sender.hasPermission("machines.admin")) break;
+
                     MachineManager.getInstance().updatePrices(true);
                     return true;
             }

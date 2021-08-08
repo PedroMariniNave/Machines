@@ -6,6 +6,7 @@ import com.zpedroo.voltzmachines.machine.Machine;
 import com.zpedroo.voltzmachines.objects.Manager;
 import com.zpedroo.voltzmachines.objects.PlayerChat;
 import com.zpedroo.voltzmachines.machine.PlayerMachine;
+import com.zpedroo.voltzmachines.utils.config.Messages;
 import com.zpedroo.voltzmachines.utils.enums.Action;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
 import com.zpedroo.voltzmachines.utils.menu.Menus;
@@ -58,9 +59,24 @@ public class PlayerChatListener implements Listener {
                         return;
                     }
 
-                    VaultHook.removeMoney(player, amount.doubleValue());
+                    VaultHook.removeMoney(player, price.multiply(amount).doubleValue());
                     player.getInventory().addItem(machine.getItem(amount, 100));
-                    player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.5f, 0.5f);
+
+                    for (String purchasedMsg : Messages.SUCCESSFUL_PURCHASED) {
+                        if (purchasedMsg == null) continue;
+
+                        player.sendMessage(StringUtils.replaceEach(purchasedMsg, new String[]{
+                                "{machine}",
+                                "{amount}",
+                                "{price}"
+                        }, new String[]{
+                                machine.getDisplayName(),
+                                NumberFormatter.getInstance().format(amount),
+                                NumberFormatter.getInstance().format(price.multiply(amount))
+                        }));
+                    }
+
+                    player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.5f, 100f);
                     return;
                 }
 
@@ -77,7 +93,22 @@ public class PlayerChatListener implements Listener {
 
                 VaultHook.removeMoney(player, price.multiply(amount).doubleValue());
                 player.getInventory().addItem(machine.getItem(amount, 100));
-                player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.5f, 0.5f);
+
+                for (String purchasedMsg : Messages.SUCCESSFUL_PURCHASED) {
+                    if (purchasedMsg == null) continue;
+
+                    player.sendMessage(StringUtils.replaceEach(purchasedMsg, new String[]{
+                            "{machine}",
+                            "{amount}",
+                            "{price}"
+                    }, new String[]{
+                            machine.getDisplayName(),
+                            NumberFormatter.getInstance().format(amount),
+                            NumberFormatter.getInstance().format(price.multiply(amount))
+                    }));
+                }
+
+                player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.5f, 100f);
             }
             case ADD_FRIEND -> {
                 Player target = Bukkit.getPlayer(msg);

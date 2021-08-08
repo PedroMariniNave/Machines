@@ -20,10 +20,10 @@ import java.util.List;
 
 public class PlayerGeneralListeners implements Listener {
 
-    private static List<Player> choosingPresent;
+    private static List<Player> choosingGift;
 
     static {
-        choosingPresent = new ArrayList<>(32);
+        choosingGift = new ArrayList<>(32);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -33,14 +33,14 @@ public class PlayerGeneralListeners implements Listener {
 
         ItemStack item = event.getItem().clone();
         NBTItem nbt = new NBTItem(item);
-        if (!nbt.hasKey("MachinesPresent")) return;
+        if (!nbt.hasKey("MachinesGift")) return;
 
         event.setCancelled(true);
 
         Player player = event.getPlayer();
 
-        Menus.getInstance().openPresentMenu(player);
-        getChoosingPresent().add(player);
+        Menus.getInstance().openGiftMenu(player);
+        getChoosingGift().add(player);
         player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 0.5f, 10f);
 
         item.setAmount(1);
@@ -49,14 +49,14 @@ public class PlayerGeneralListeners implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onClose(InventoryCloseEvent event) {
-        if (!getChoosingPresent().contains(event.getPlayer())) return;
+        if (!getChoosingGift().contains(event.getPlayer())) return;
 
         Player player = (Player) event.getPlayer();
         Inventory inventory = event.getInventory();
         VoltzMachines.get().getServer().getScheduler().runTaskLater(VoltzMachines.get(), () -> player.openInventory(inventory), 0L);
     }
 
-    public static List<Player> getChoosingPresent() {
-        return choosingPresent;
+    public static List<Player> getChoosingGift() {
+        return choosingGift;
     }
 }

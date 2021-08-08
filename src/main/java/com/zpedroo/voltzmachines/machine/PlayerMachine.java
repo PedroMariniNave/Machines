@@ -25,12 +25,13 @@ public class PlayerMachine {
     private Integer integrity;
     private Machine machine;
     private List<Manager> managers;
+    private Boolean infinite;
     private Boolean status;
     private Boolean update;
     private Integer delay;
     private MachineHologram hologram;
 
-    public PlayerMachine(Location location, UUID ownerUUID, BigInteger stack, BigInteger fuel, BigInteger drops, Integer integrity, Machine machine, List<Manager> managers) {
+    public PlayerMachine(Location location, UUID ownerUUID, BigInteger stack, BigInteger fuel, BigInteger drops, Integer integrity, Machine machine, List<Manager> managers, Boolean infinite) {
         this.location = location;
         this.ownerUUID = ownerUUID;
         this.stack = stack;
@@ -39,6 +40,7 @@ public class PlayerMachine {
         this.integrity = integrity;
         this.machine = machine;
         this.managers = managers;
+        this.infinite = infinite;
         this.status = false;
         this.update = false;
         this.delay = machine.getDelay();
@@ -77,6 +79,10 @@ public class PlayerMachine {
         return managers;
     }
 
+    public Boolean isInfinite() {
+        return infinite;
+    }
+
     public Manager getManager(UUID uuid) {
         for (Manager manager : getManagers()) {
             if (!manager.getUUID().equals(uuid)) continue;
@@ -96,6 +102,8 @@ public class PlayerMachine {
     }
 
     public Boolean hasReachStackLimit() {
+        if (machine.getMaxStack().signum() < 0) return false;
+
         return stack.compareTo(machine.getMaxStack()) >= 0;
     }
 
@@ -118,10 +126,16 @@ public class PlayerMachine {
     public void delete() {
         MachineManager.getInstance().getDataCache().getDeletedMachines().add(location);
         MachineManager.getInstance().getDataCache().getPlayerMachines().remove(location);
-        MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(getOwnerUUID()).remove(this);
+        MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(ownerUUID).remove(this);
 
         this.hologram.remove();
         this.location.getBlock().setType(Material.AIR);
+    }
+
+    public void setInfinite(Boolean infinite) {
+        this.infinite = infinite;
+        this.update = true;
+        this.hologram.update(this);
     }
 
     public String replace(String text) {
@@ -141,7 +155,7 @@ public class PlayerMachine {
                 machine.getTypeTranslated(),
                 NumberFormatter.getInstance().format(stack),
                 NumberFormatter.getInstance().format(machine.getMaxStack()),
-                NumberFormatter.getInstance().format(fuel),
+                infinite ? "∞" : NumberFormatter.getInstance().format(fuel),
                 NumberFormatter.getInstance().format(drops),
                 integrity.toString() + "%",
                 status ? Messages.ENABLED : Messages.DISABLED

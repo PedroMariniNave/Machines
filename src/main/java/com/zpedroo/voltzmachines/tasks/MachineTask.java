@@ -46,10 +46,13 @@ public class MachineTask extends BukkitRunnable {
             BigInteger fuel = drops.divide(BigInteger.TEN); // 10 stacks = 1L
 
             machine.addDrops(drops);
-            machine.removeFuel(fuel.signum() <= 0 ? BigInteger.ONE : fuel);
 
-            if (machine.getFuel().signum() <= 0) {
-                machine.switchStatus();
+            if (!machine.isInfinite()) {
+                machine.removeFuel(fuel.signum() <= 0 ? BigInteger.ONE : fuel);
+
+                if (machine.getFuel().signum() <= 0) {
+                    machine.switchStatus();
+                }
             }
 
             machine.updateDelay();

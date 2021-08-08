@@ -34,10 +34,11 @@ public class MachineListeners implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        final ItemStack item = event.getItemInHand().clone();
-        if (item.getType().equals(Material.AIR)) return;
+        if (event.getItemInHand() == null || event.getItemInHand().getType().equals(Material.AIR)) return;
 
+        final ItemStack item = event.getItemInHand().clone();
         NBTItem nbt = new NBTItem(item);
+        if (nbt.hasKey("MachinesFuel") || nbt.hasKey("MachinesInfiniteFuel") || nbt.hasKey("MachinesRepair")) event.setCancelled(true);
         if (!nbt.hasKey("MachinesAmount")) return;
 
         event.setCancelled(true);
@@ -90,11 +91,11 @@ public class MachineListeners implements Listener {
                 }
             }
 
-            if (stack.compareTo(machine.getMaxStack()) > 0) {
+            if (machine.getMaxStack().signum() > 0 && stack.compareTo(machine.getMaxStack()) > 0) {
                 overLimit = stack.subtract(machine.getMaxStack());
             } else overLimit = BigInteger.ZERO;
 
-            playerMachine = new PlayerMachine(block.getLocation(), player.getUniqueId(), stack.subtract(overLimit), BigInteger.ZERO, BigInteger.ZERO, integrity, machine, new ArrayList<>());
+            playerMachine = new PlayerMachine(block.getLocation(), player.getUniqueId(), stack.subtract(overLimit), BigInteger.ZERO, BigInteger.ZERO, integrity, machine, new ArrayList<>(), false);
             playerMachine.cache();
             playerMachine.setQueueUpdate(true);
         }
@@ -111,7 +112,7 @@ public class MachineListeners implements Listener {
         Block block = event.getClickedBlock();
         if (block == null) return;
 
-        PlayerMachine machine = getManager().getDataCache().getPlayerMachines().get(block.getLocation());
+        PlayerMachine machine = getManager().getMachine(block.getLocation());
         if (machine == null) return;
 
         event.setCancelled(true);
@@ -126,6 +127,16 @@ public class MachineListeners implements Listener {
 
         if (item.getType() != Material.AIR) {
             NBTItem nbt = new NBTItem(item);
+
+            if (nbt.hasKey("MachinesInfiniteFuel")) {
+                if (machine.isInfinite()) return;
+
+                machine.setInfinite(true);
+                item.setAmount(1);
+                player.playSound(player.getLocation(), Sound.BLOCK_LAVA_AMBIENT, 0.5f, 10f);
+                player.getInventory().removeItem(item);
+                return;
+            }
 
             if (nbt.hasKey("MachinesFuel")) {
                 BigInteger amount = new BigInteger(nbt.getString("MachinesFuel"));
@@ -164,9 +175,8 @@ public class MachineListeners implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
-        if (!getManager().getDataCache().getPlayerMachines().containsKey(block.getLocation())) return;
 
-        PlayerMachine machine = getManager().getDataCache().getPlayerMachines().get(block.getLocation());
+        PlayerMachine machine = getManager().getMachine(block.getLocation());
         if (machine == null) return;
 
         event.setCancelled(true);
@@ -200,6 +210,10 @@ public class MachineListeners implements Listener {
             }, new String[]{
                     NumberFormatter.getInstance().format(machine.getStack().subtract(toGive))
             }));
+        }
+
+        if (machine.isInfinite()) {
+            player.getInventory().addItem(Items.getInstance().getInfiniteFuel());
         }
 
         if (machine.getFuel().signum() <= 0) return;

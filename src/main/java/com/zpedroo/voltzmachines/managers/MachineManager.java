@@ -5,7 +5,7 @@ import com.zpedroo.voltzmachines.VoltzMachines;
 import com.zpedroo.voltzmachines.hooks.WorldGuardHook;
 import com.zpedroo.voltzmachines.machine.Machine;
 import com.zpedroo.voltzmachines.machine.PlayerMachine;
-import com.zpedroo.voltzmachines.machine.cache.MachineCacheData;
+import com.zpedroo.voltzmachines.machine.cache.MachineDataCache;
 import com.zpedroo.voltzmachines.mysql.DBConnection;
 import com.zpedroo.voltzmachines.objects.Manager;
 import com.zpedroo.voltzmachines.utils.builder.ItemBuilder;
@@ -35,11 +35,11 @@ public class MachineManager {
     private static MachineManager instance;
     public static MachineManager getInstance() { return instance; }
 
-    private MachineCacheData machineCacheData;
+    private MachineDataCache machineDataCache;
 
     public MachineManager() {
         instance = this;
-        this.machineCacheData = new MachineCacheData();
+        this.machineDataCache = new MachineDataCache();
         this.loadConfigMachines();
         new BukkitRunnable() {
             @Override
@@ -47,13 +47,13 @@ public class MachineManager {
                 for (World world : Bukkit.getWorlds()) {
                     for (Entity entity : world.getEntities()) {
                         if (!entity.getType().equals(EntityType.DROPPED_ITEM)) continue;
-                        if (!StringUtils.equals(entity.getName(), "Machine Item")) continue;
 
                         entity.remove();
                     }
                 }
 
                 loadPlacedMachines();
+                updateTopMachines();
             }
         }.runTaskLaterAsynchronously(VoltzMachines.get(), 100L);
     }
@@ -138,6 +138,10 @@ public class MachineManager {
         getDataCache().setPlayerMachines(DBConnection.getInstance().getDBManager().getPlacedMachines());
     }
 
+    public void updateTopMachines() {
+        getDataCache().setTopMachines(getTopMachines());
+    }
+
     public void saveAll() {
         new HashSet<>(getDataCache().getDeletedMachines()).forEach(machine -> {
             DBConnection.getInstance().getDBManager().deleteMachine(serializeLocation(machine));
@@ -156,6 +160,18 @@ public class MachineManager {
 
     private void cache(Machine machine) {
         getDataCache().getMachines().put(machine.getType().toUpperCase(), machine);
+    }
+
+    public Map<UUID, BigInteger> getTopMachines() {
+        Map<UUID, BigInteger> playerMachines = new HashMap<>(getDataCache().getPlayerMachinesByUUID().size());
+
+        new HashSet<>(getDataCache().getPlayerMachinesByUUID().values()).forEach(machines -> {
+            new HashSet<>(machines).forEach(machine -> {
+                playerMachines.put(machine.getOwnerUUID(), machine.getStack().add(playerMachines.getOrDefault(machine.getOwnerUUID(), BigInteger.ZERO)));
+            });
+        });
+
+        return orderTop(playerMachines, 10);
     }
 
     public Object[] getNearMachines(Player player, Block block, BigInteger addAmount, String type) {
@@ -179,7 +195,7 @@ public class MachineManager {
                     if (machine.hasReachStackLimit()) continue;
 
                     BigInteger overLimit = BigInteger.ZERO;
-                    if (machine.getStack().add(addAmount).compareTo(machine.getMachine().getMaxStack()) > 0) {
+                    if (machine.getMachine().getMaxStack().signum() > 0 && machine.getStack().add(addAmount).compareTo(machine.getMachine().getMaxStack()) > 0) {
                         overLimit = machine.getStack().add(addAmount).subtract(machine.getMachine().getMaxStack());
                     }
 
@@ -191,11 +207,13 @@ public class MachineManager {
         return null;
     }
 
-    public MachineCacheData getDataCache() {
-        return machineCacheData;
+    public MachineDataCache getDataCache() {
+        return machineDataCache;
     }
 
     public PlayerMachine getMachine(Location location) {
+        if (!getDataCache().getPlayerMachines().containsKey(location)) return null;
+        
         return getDataCache().getPlayerMachines().get(location);
     }
 
@@ -275,5 +293,18 @@ public class MachineManager {
         int day = calendar.get(Calendar.DATE);
         calendar.set(year, month, day, 23, 59, 59);
         return calendar.getTime();
+    }
+
+    private Map<UUID, BigInteger> orderTop(Map<UUID, BigInteger> map, Integer limit) {
+        List<Map.Entry<UUID, BigInteger> > list = new LinkedList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+
+        Map<UUID, BigInteger> ret = new HashMap<>(limit);
+        for (Map.Entry<UUID, BigInteger> entry : list) {
+            if (ret.size() >= limit) break;
+
+            ret.put(entry.getKey(), entry.getValue());
+        }
+        return ret;
     }
 }

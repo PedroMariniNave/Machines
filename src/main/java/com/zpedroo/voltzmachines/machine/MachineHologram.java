@@ -29,7 +29,7 @@ public class MachineHologram {
         if (hologram != null && hologram.isDeleted()) return;
 
         if (hologram == null) {
-            hologram = HologramsAPI.createHologram(VoltzMachines.get(), machine.getLocation().clone().add(0.5D, 3.75, 0.5D));
+            hologram = HologramsAPI.createHologram(VoltzMachines.get(), machine.getLocation().clone().add(0.5D, 3.95, 0.5D));
             textLines = new TextLine[hologramLines.length];
 
             for (int i = 0; i < hologramLines.length; i++) {

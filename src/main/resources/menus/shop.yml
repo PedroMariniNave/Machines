@@ -20,7 +20,8 @@ Inventory:
         - ' &8▶ &7Estatística: {statistics}'
         - ''
         - '&7Próxima cotação em:'
-        - '&f{update}'
+        - ''
+        - ' &8▶ &f{update}'
         - ''
         - '&7Clique para escolher a quantia!'
       price: 50000000

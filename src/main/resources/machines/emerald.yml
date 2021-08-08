@@ -1,6 +1,6 @@
 Machine-Settings:
   machine-block: EMERALD_BLOCK
-  type-translated: ESMERALDA
+  type-translated: Esmeralda
   display-name: '&2Máquina de Esmeralda'
   drops:
     price: 0

@@ -112,9 +112,11 @@ public class FileUtils {
         CONFIG("config", "yml", "configuration-files", "", false),
         MANAGERS("managers", "yml", "menus", "menus", false),
         PERMISSIONS("permissions", "yml", "menus", "menus", false),
-        PLAYERMACHINES("playermachines", "yml", "menus", "menus", false),
+        PLAYER_MACHINES("player_machines", "yml", "menus", "menus", false),
+        OTHER_MACHINES("other_machines", "yml", "menus", "menus", false),
+        TOP_MACHINES("top_machines", "yml", "menus", "menus", false),
         SHOP("shop", "yml", "menus", "menus", false),
-        PRESENT("present", "yml", "menus", "menus", false),
+        GIFT("gift", "yml", "menus", "menus", false),
         MAIN("main", "yml", "menus", "menus", false),
         EMERALD("emerald", "yml", "machines", "machines", true);
 
