@@ -1,5 +1,7 @@
 package com.zpedroo.voltzmachines.utils.builder;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.zpedroo.voltzmachines.VoltzMachines;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -10,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class InventoryUtils {
@@ -18,112 +19,79 @@ public class InventoryUtils {
     private static InventoryUtils instance;
     public static InventoryUtils getInstance() { return instance; }
 
-    /**
-     * Map with all inventory actions
-     *
-     * Key = Inventory
-     * Value = List of Actions
-     */
-    private HashMap<Inventory, List<Action>> inventoryActions;
+    private Table<Inventory, Object, List<Action>> inventoryActions;
 
-    /**
-     * Constructor
-     */
     public InventoryUtils() {
         instance = this;
-        this.inventoryActions = new HashMap<>(64);
+        this.inventoryActions = HashBasedTable.create();
         VoltzMachines.get().getServer().getPluginManager().registerEvents(new ActionListeners(), VoltzMachines.get()); // register inventory listener
     }
 
-    /**
-     * Method to add new action
-     * to an inventory
-     *
-     * @param inventory that will have the action
-     * @param item that will be used to execute the action
-     * @param action that will be executed
-     * @param click type
-     */
-    public void addAction(Inventory inventory, ItemStack item, Runnable action, ActionClick click) {
-        List<Action> actions = getInventoryActions().containsKey(inventory) ? getInventoryActions().get(inventory) : new ArrayList<>(40);
+    public void addAction(Inventory inventory, Object object, Runnable action, ActionType type) {
+        List<Action> actions = hasAction(inventory, object) ? getActions(inventory, object) : new ArrayList<>(2);
+        actions.add(new Action(type, object, action));
 
-        actions.add(new Action(click, item, action));
-
-        getInventoryActions().put(inventory, actions);
+        inventoryActions.put(inventory, object, actions);
     }
 
-    /**
-     * Method to get actions
-     *
-     * @param inventory that have the action
-     * @param item that have the action
-     * @param click type
-     * @return action based on specifications or null
-     */
-    public Action getAction(Inventory inventory, ItemStack item, ActionClick click) {
-        for (Action action : getInventoryActions().get(inventory)) {
-            if (action == null) continue;
+    public Action getAction(Inventory inventory, Object object, ActionType actionType) {
+        if (!hasAction(inventory, object)) return null;
 
-            if (action.getClick() == click && action.getItem().equals(item)) return action;
+        for (Action action : getActions(inventory, object)) {
+            if (action.getType() != actionType) continue;
+
+            return action;
         }
 
         return null;
     }
 
-    /**
-     * Boolean to check if
-     * inventory has actions
-     *
-     * @param inventory that will be checked
-     * @return true or false
-     */
     public Boolean hasAction(Inventory inventory) {
-        return getInventoryActions().containsKey(inventory);
+        return inventoryActions.containsRow(inventory);
     }
 
-    /**
-     * Method to get all actions
-     * from a specific inventory
-     *
-     * @param inventory that have the actions
-     * @return list of actions
-     */
-    public List<Action> getActions(Inventory inventory) {
-        return getInventoryActions().get(inventory);
+    public Boolean hasAction(Inventory inventory, Object object) {
+        return inventoryActions.row(inventory).containsKey(object);
     }
 
-    /**
-     * Map with all inventory actions
-     *
-     * Key = Inventory
-     * Value = List of Actions
-     */
-    private HashMap<Inventory, List<Action>> getInventoryActions() {
-        return inventoryActions;
+    public List<Action> getInventoryActions(Inventory inventory) {
+        if (!hasAction(inventory)) return null;
+
+        List<Action> ret = new ArrayList<>(inventoryActions.row(inventory).values().size());
+
+        for (List<Action> actions : inventoryActions.values()) {
+            ret.addAll(actions);
+        }
+
+        return ret;
+    }
+
+    public List<Action> getActions(Inventory inventory, Object object) {
+        return inventoryActions.row(inventory).get(object);
     }
 
     public static class Action {
 
-        private ActionClick click;
-        private ItemStack item;
+        private ActionType type;
+        private Object object;
         private Runnable action;
 
-        public Action(ActionClick click, ItemStack item, Runnable action) {
-            this.click = click;
-            this.item = item;
+        public Action(ActionType type, Object object, Runnable action) {
+            this.type = type;
+            this.object = object;
             this.action = action;
         }
 
-        public ActionClick getClick() {
-            return click;
-        }
-
-        public ItemStack getItem() {
-            return item;
+        public ActionType getType() {
+            return type;
         }
 
         public Runnable getAction() {
             return action;
+        }
+
+        public Object getObject() {
+            return object;
         }
 
         public void run() {
@@ -133,36 +101,53 @@ public class InventoryUtils {
         }
     }
 
-    public class ActionListeners implements Listener {
+    private class ActionListeners implements Listener {
 
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
         public void onClick(InventoryClickEvent event) {
-            if (!InventoryUtils.getInstance().getInventoryActions().containsKey(event.getInventory())) return;
+            if (!hasAction(event.getInventory())) return;
 
             event.setCancelled(true);
 
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
 
+            Inventory inventory = event.getInventory();
             ItemStack item = event.getCurrentItem().clone();
-            Action action = getAction(event.getInventory(), item, ActionClick.ALL);
+            int slot = event.getSlot();
 
-            if (action == null) {
-                // try to found specific actions
-                switch (event.getClick()) {
-                    case LEFT, SHIFT_LEFT -> action = getAction(event.getInventory(), item, ActionClick.LEFT);
-                    case RIGHT, SHIFT_RIGHT -> action = getAction(event.getInventory(), item, ActionClick.RIGHT);
+            Action action = null;
+
+            try {
+                action = getAction(inventory, item, ActionType.ALL_CLICKS);
+
+                if (action == null) {
+                    // try to found specific actions for items
+                    switch (event.getClick()) {
+                        case LEFT, SHIFT_LEFT -> action = getAction(inventory, item, ActionType.LEFT_CLICK);
+                        case RIGHT, SHIFT_RIGHT -> action = getAction(event.getInventory(), item, ActionType.RIGHT_CLICK);
+                    }
+                }
+            } finally {
+                if (action != null) return;
+
+                action = getAction(inventory, slot, ActionType.ALL_CLICKS);
+
+                if (action == null) {
+                    // try to found specific actions for items
+                    switch (event.getClick()) {
+                        case LEFT, SHIFT_LEFT -> action = getAction(inventory, slot, ActionType.LEFT_CLICK);
+                        case RIGHT, SHIFT_RIGHT -> action = getAction(event.getInventory(), slot, ActionType.RIGHT_CLICK);
+                    }
                 }
             }
 
-            if (action == null) return;
-
-            action.run();
+            if (action != null) action.run();
         }
     }
 
-    public enum ActionClick {
-        LEFT,
-        RIGHT,
-        ALL
+    public enum ActionType {
+        LEFT_CLICK,
+        RIGHT_CLICK,
+        ALL_CLICKS
     }
 }

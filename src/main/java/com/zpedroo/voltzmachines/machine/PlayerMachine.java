@@ -4,6 +4,7 @@ import com.zpedroo.voltzmachines.VoltzMachines;
 import com.zpedroo.voltzmachines.managers.MachineManager;
 import com.zpedroo.voltzmachines.objects.Manager;
 import com.zpedroo.voltzmachines.utils.config.Messages;
+import com.zpedroo.voltzmachines.utils.config.Titles;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -25,13 +26,14 @@ public class PlayerMachine {
     private Integer integrity;
     private Machine machine;
     private List<Manager> managers;
-    private Boolean infinite;
+    private Boolean infiniteFuel;
+    private Boolean infiniteIntegrity;
     private Boolean status;
     private Boolean update;
     private Integer delay;
     private MachineHologram hologram;
 
-    public PlayerMachine(Location location, UUID ownerUUID, BigInteger stack, BigInteger fuel, BigInteger drops, Integer integrity, Machine machine, List<Manager> managers, Boolean infinite) {
+    public PlayerMachine(Location location, UUID ownerUUID, BigInteger stack, BigInteger fuel, BigInteger drops, Integer integrity, Machine machine, List<Manager> managers, Boolean infiniteFuel, Boolean infiniteIntegrity) {
         this.location = location;
         this.ownerUUID = ownerUUID;
         this.stack = stack;
@@ -40,7 +42,8 @@ public class PlayerMachine {
         this.integrity = integrity;
         this.machine = machine;
         this.managers = managers;
-        this.infinite = infinite;
+        this.infiniteFuel = infiniteFuel;
+        this.infiniteIntegrity = infiniteIntegrity;
         this.status = false;
         this.update = false;
         this.delay = machine.getDelay();
@@ -79,12 +82,16 @@ public class PlayerMachine {
         return managers;
     }
 
-    public Boolean isInfinite() {
-        return infinite;
+    public Boolean hasInfiniteFuel() {
+        return infiniteFuel;
+    }
+
+    public Boolean hasInfiniteIntegrity() {
+        return infiniteIntegrity;
     }
 
     public Manager getManager(UUID uuid) {
-        for (Manager manager : getManagers()) {
+        for (Manager manager : managers) {
             if (!manager.getUUID().equals(uuid)) continue;
 
             return manager;
@@ -132,8 +139,14 @@ public class PlayerMachine {
         this.location.getBlock().setType(Material.AIR);
     }
 
-    public void setInfinite(Boolean infinite) {
-        this.infinite = infinite;
+    public void setInfiniteFuel(Boolean infiniteFuel) {
+        this.infiniteFuel = infiniteFuel;
+        this.update = true;
+        this.hologram.update(this);
+    }
+
+    public void setInfiniteIntegrity(Boolean infiniteIntegrity) {
+        this.infiniteIntegrity = infiniteIntegrity;
         this.update = true;
         this.hologram.update(this);
     }
@@ -155,9 +168,9 @@ public class PlayerMachine {
                 machine.getTypeTranslated(),
                 NumberFormatter.getInstance().format(stack),
                 NumberFormatter.getInstance().format(machine.getMaxStack()),
-                infinite ? "∞" : NumberFormatter.getInstance().format(fuel),
+                infiniteFuel ? "∞" : NumberFormatter.getInstance().format(fuel),
                 NumberFormatter.getInstance().format(drops),
-                integrity.toString() + "%",
+                infiniteIntegrity ? "∞" : integrity.toString() + "%",
                 status ? Messages.ENABLED : Messages.DISABLED
         });
     }
@@ -207,7 +220,7 @@ public class PlayerMachine {
     public void removeStack(BigInteger value) {
         this.stack = stack.subtract(value);
         this.update = true;
-        if (getStack().signum() <= 0) {
+        if (stack.signum() <= 0) {
             VoltzMachines.get().getServer().getScheduler().runTaskLater(VoltzMachines.get(), this::delete, 0L); // fix async block remove
             return;
         }
@@ -246,7 +259,7 @@ public class PlayerMachine {
     public void sellDrops(Player player) {
         if (drops.signum() <= 0) return;
 
-        for (String cmd : getMachine().getCommands()) {
+        for (String cmd : machine.getCommands()) {
             if (cmd == null) break;
 
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), StringUtils.replaceEach(cmd, new String[]{
@@ -254,9 +267,15 @@ public class PlayerMachine {
                     "{amount}"
             }, new String[]{
                     player.getName(),
-                    getDrops().toString()
+                    drops.toString()
             }));
         }
+
+        player.sendTitle(Titles.WHEN_SELL_TITLE, StringUtils.replaceEach(Titles.WHEN_SELL_SUBTITLE, new String[]{
+                "{value}"
+        }, new String[]{
+                NumberFormatter.getInstance().format(drops)
+        }));
 
         this.drops = BigInteger.ZERO;
         this.hologram.update(this);

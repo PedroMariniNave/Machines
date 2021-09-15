@@ -153,13 +153,13 @@ public class FileUtils {
 
     public class FileManager {
 
-        private File pdfile;
-        private FileConfiguration language;
+        private File file;
+        private FileConfiguration yamlConfig;
 
         public FileManager(Files file) {
-            this.pdfile = new File(voltzMachines.getDataFolder() + (file.getFolder().isEmpty() ? "" : "/" + file.getFolder()), file.getName() + '.' + file.getExtension());
+            this.file = new File(voltzMachines.getDataFolder() + (file.getFolder().isEmpty() ? "" : "/" + file.getFolder()), file.getName() + '.' + file.getExtension());
 
-            if (!pdfile.exists()) {
+            if (!this.file.exists()) {
                 if (file.requireEmpty) {
                     File folder = new File(voltzMachines.getDataFolder(), "/machines");
                     if (folder.listFiles() != null) {
@@ -168,10 +168,10 @@ public class FileUtils {
                 }
 
                 try {
-                    pdfile.getParentFile().mkdirs();
-                    pdfile.createNewFile();
+                    this.file.getParentFile().mkdirs();
+                    this.file.createNewFile();
 
-                    copy(voltzMachines.getResource((file.getResource().isEmpty() ? "" : file.getResource() + "/") + file.getName() + '.' + file.getExtension()), pdfile);
+                    copy(voltzMachines.getResource((file.getResource().isEmpty() ? "" : file.getResource() + "/") + file.getName() + '.' + file.getExtension()), this.file);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -180,24 +180,24 @@ public class FileUtils {
             if (!StringUtils.equals(file.getExtension(), "yml")) return;
 
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(pdfile), CHARSET_NAME));
-                language = YamlConfiguration.loadConfiguration(reader);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.file), CHARSET_NAME));
+                yamlConfig = YamlConfiguration.loadConfiguration(reader);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
         public FileConfiguration get() {
-            return language;
+            return yamlConfig;
         }
 
         public File getFile() {
-            return pdfile;
+            return file;
         }
 
         public void save() {
             try {
-                language.save(pdfile);
+                yamlConfig.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -205,7 +205,7 @@ public class FileUtils {
 
         public void reload() {
             try {
-                language = YamlConfiguration.loadConfiguration(pdfile);
+                yamlConfig = YamlConfiguration.loadConfiguration(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

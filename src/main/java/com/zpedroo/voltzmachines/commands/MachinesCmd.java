@@ -21,11 +21,12 @@ public class MachinesCmd implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = sender instanceof Player ? (Player) sender : null;
-        Player target = null;
-        BigInteger amount = null;
 
         if (args.length > 0) {
             String arg = args[0].toUpperCase();
+            Player target = null;
+            BigInteger amount = null;
+            ItemStack item = null;
 
             switch (arg) {
                 case "TOP":
@@ -88,7 +89,7 @@ public class MachinesCmd implements CommandExecutor {
 
                     target.getInventory().addItem(Items.getInstance().getFuel(amount));
                     return true;
-                case "INFINITE":
+                case "INFINITE_FUEL":
                     if (!sender.hasPermission("machines.admin")) break;
 
                     if (args.length < 3) {
@@ -112,7 +113,7 @@ public class MachinesCmd implements CommandExecutor {
                         return true;
                     }
 
-                    ItemStack item = Items.getInstance().getInfiniteFuel();
+                    item = Items.getInstance().getInfiniteFuel();
                     item.setAmount(amount.intValue());
 
                     target.getInventory().addItem(item);
@@ -166,6 +167,35 @@ public class MachinesCmd implements CommandExecutor {
                     }
 
                     target.getInventory().addItem(Items.getInstance().getRepair(percentage.intValue()));
+                    return true;
+                case "INFINITE_REPAIR":
+                    if (!sender.hasPermission("machines.admin")) break;
+
+                    if (args.length < 3) {
+                        sender.sendMessage(Messages.MACHINE_USAGE);
+                        return true;
+                    }
+
+                    amount = NumberFormatter.getInstance().filter(args[2]);
+
+                    if (amount.signum() <= 0) {
+                        sender.sendMessage(Messages.INVALID_AMOUNT);
+                        return true;
+                    }
+
+                    if (amount.compareTo(BigInteger.valueOf(2304)) > 0) amount = BigInteger.valueOf(2304);
+
+                    target = Bukkit.getPlayer(args[1]);
+
+                    if (target == null) {
+                        sender.sendMessage(Messages.OFFLINE_PLAYER);
+                        return true;
+                    }
+
+                    item = Items.getInstance().getInfiniteRepair();
+                    item.setAmount(amount.intValue());
+
+                    target.getInventory().addItem(item);
                     return true;
                 case "GIFT":
                     if (!sender.hasPermission("machines.admin")) break;

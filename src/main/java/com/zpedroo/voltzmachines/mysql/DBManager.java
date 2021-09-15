@@ -31,13 +31,14 @@ public class DBManager {
                     "`integrity`='" + machine.getIntegrity().toString() + "', " +
                     "`type`='" + machine.getMachine().getType() + "', " +
                     "`managers`='" + getManager().serializeManagers(machine.getManagers()) + "', " +
-                    "`infinite`='" + (machine.isInfinite() ? 1 : 0) + "' " +
+                    "`infinite_fuel`='" + (machine.hasInfiniteFuel() ? 1 : 0) + "', " +
+                    "`infinite_integrity`='" + (machine.hasInfiniteIntegrity() ? 1 : 0) + "' " +
                     "WHERE `location`='" + getManager().serializeLocation(machine.getLocation()) + "';";
             executeUpdate(query);
             return;
         }
 
-        String query = "INSERT INTO `" + DBConnection.TABLE + "` (`location`, `uuid`, `stack`, `fuel`, `drops`, `integrity`, `type`, `managers`, `infinite`) VALUES " +
+        String query = "INSERT INTO `" + DBConnection.TABLE + "` (`location`, `uuid`, `stack`, `fuel`, `drops`, `integrity`, `type`, `managers`, `infinite_fuel`, `infinite_integrity`) VALUES " +
                 "('" + getManager().serializeLocation(machine.getLocation()) + "', " +
                 "'" + machine.getOwnerUUID().toString() + "', " +
                 "'" + machine.getStack().toString() + "', " +
@@ -46,7 +47,8 @@ public class DBManager {
                 "'" + machine.getIntegrity().toString() + "', " +
                 "'" + machine.getMachine().getType() + "', " +
                 "'" + getManager().serializeManagers(machine.getManagers()) + "', " +
-                "'" + (machine.isInfinite() ? 1 : 0) + "');";
+                "'" + (machine.hasInfiniteFuel() ? 1 : 0) + "', " +
+                "'" + (machine.hasInfiniteIntegrity() ? 1 : 0) + "');";
         executeUpdate(query);
     }
 
@@ -77,8 +79,9 @@ public class DBManager {
                 Integer integrity = result.getInt(6);
                 Machine machine = getManager().getMachine(result.getString(7));
                 List<Manager> managers = getManager().deserializeManagers(result.getString(8));
-                Boolean infinite = result.getBoolean(9);
-                PlayerMachine playerMachine = new PlayerMachine(location, ownerUUID, stack.toBigInteger(), fuel.toBigInteger(), drops.toBigInteger(), integrity, machine, managers, infinite);
+                Boolean infiniteFuel = result.getBoolean(9);
+                Boolean infiniteIntegrity = result.getBoolean(10);
+                PlayerMachine playerMachine = new PlayerMachine(location, ownerUUID, stack.toBigInteger(), fuel.toBigInteger(), drops.toBigInteger(), integrity, machine, managers, infiniteFuel, infiniteIntegrity);
 
                 machines.put(location, playerMachine);
 
@@ -141,7 +144,7 @@ public class DBManager {
     }
 
     protected void createTable() {
-        String query = "CREATE TABLE IF NOT EXISTS `" + DBConnection.TABLE + "` (`location` VARCHAR(255) NOT NULL, `uuid` VARCHAR(255) NOT NULL, `stack` DECIMAL(40,0) NOT NULL, `fuel` DECIMAL(40,0) NOT NULL, `drops` DECIMAL(40,0) NOT NULL, `integrity` INTEGER NOT NULL, `type` VARCHAR(32) NOT NULL, `managers` LONGTEXT NOT NULL, `infinite` BOOLEAN NOT NULL, PRIMARY KEY(`location`));";
+        String query = "CREATE TABLE IF NOT EXISTS `" + DBConnection.TABLE + "` (`location` VARCHAR(255), `uuid` VARCHAR(255), `stack` DECIMAL(40,0), `fuel` DECIMAL(40,0), `drops` DECIMAL(40,0), `integrity` INTEGER, `type` VARCHAR(32), `managers` LONGTEXT, `infinite_fuel` BOOLEAN, `infinite_integrity` BOOLEAN, PRIMARY KEY(`location`));";
         executeUpdate(query);
     }
 

@@ -40,7 +40,7 @@ public class PlayerGeneralListeners implements Listener {
         Player player = event.getPlayer();
 
         Menus.getInstance().openGiftMenu(player);
-        getChoosingGift().add(player);
+        choosingGift.add(player);
         player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 0.5f, 10f);
 
         item.setAmount(1);
@@ -49,7 +49,7 @@ public class PlayerGeneralListeners implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onClose(InventoryCloseEvent event) {
-        if (!getChoosingGift().contains(event.getPlayer())) return;
+        if (!choosingGift.contains(event.getPlayer())) return;
 
         Player player = (Player) event.getPlayer();
         Inventory inventory = event.getInventory();

@@ -305,6 +305,7 @@ public class MachineManager {
 
             ret.put(entry.getKey(), entry.getValue());
         }
+
         return ret;
     }
 }

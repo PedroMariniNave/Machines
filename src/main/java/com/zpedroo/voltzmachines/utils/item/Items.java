@@ -19,6 +19,7 @@ public class Items {
 
     private ItemStack fuel;
     private ItemStack infiniteFuel;
+    private ItemStack infiniteRepair;
     private ItemStack pickaxe;
     private ItemStack repair;
     private ItemStack gift;
@@ -27,6 +28,7 @@ public class Items {
         instance = this;
         this.fuel = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Fuel").build();
         this.infiniteFuel = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Infinite-Fuel").build();
+        this.infiniteRepair = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Infinite-Repair").build();
         this.pickaxe = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Pickaxe").build();
         this.repair = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Repair").build();
         this.gift = ItemBuilder.build(FileUtils.get().getFile(FileUtils.Files.CONFIG).get(), "Gift").build();
@@ -72,6 +74,13 @@ public class Items {
     public ItemStack getInfiniteFuel() {
         NBTItem nbt = new NBTItem(infiniteFuel.clone());
         nbt.addCompound("MachinesInfiniteFuel");
+
+        return nbt.getItem();
+    }
+
+    public ItemStack getInfiniteRepair() {
+        NBTItem nbt = new NBTItem(infiniteRepair.clone());
+        nbt.addCompound("MachinesInfiniteRepair");
 
         return nbt.getItem();
     }

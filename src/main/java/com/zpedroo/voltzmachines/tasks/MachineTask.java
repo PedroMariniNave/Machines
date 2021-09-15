@@ -35,10 +35,28 @@ public class MachineTask extends BukkitRunnable {
                 drops = machine.getMachine().getAmount().multiply(machine.getStack().subtract(machine.getFuel()));
             }
 
-            if (machine.getIntegrity() <= 70) { // low efficiency
-                Integer toDivide = (100 - machine.getIntegrity()) / 10;
+            if (!machine.hasInfiniteIntegrity()) {
+                if (machine.getIntegrity() <= 70) { // low efficiency
+                    Integer toDivide = (100 - machine.getIntegrity()) / 10;
 
-                if (toDivide >= 2) drops = drops.divide(BigInteger.valueOf(toDivide));
+                    if (toDivide >= 2) drops = drops.divide(BigInteger.valueOf(toDivide));
+                }
+
+                Random random = new Random();
+
+                if (random.nextInt(100 + 1) <= 25) {
+                    machine.setIntegrity(machine.getIntegrity() - 1);
+                }
+
+                if (machine.getIntegrity() <= 60) { // 60% of integrity = chance of stop machine and lost all drops
+                    if (random.nextInt(100 + 1) <= 5) {
+                        machine.switchStatus();
+                        machine.setDrops(BigInteger.ZERO);
+                        machine.getLocation().getWorld().playSound(machine.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 10f, 10f);
+
+                        ParticleEffect.EXPLOSION_HUGE.display(machine.getLocation().clone().add(0.5D, 0D, 0.5D));
+                    }
+                }
             }
 
             if (drops.signum() <= 0) drops = BigInteger.ONE;
@@ -47,7 +65,7 @@ public class MachineTask extends BukkitRunnable {
 
             machine.addDrops(drops);
 
-            if (!machine.isInfinite()) {
+            if (!machine.hasInfiniteFuel()) {
                 machine.removeFuel(fuel.signum() <= 0 ? BigInteger.ONE : fuel);
 
                 if (machine.getFuel().signum() <= 0) {
@@ -63,22 +81,6 @@ public class MachineTask extends BukkitRunnable {
 
             while (y < 2.25D) {
                 ParticleEffect.SMOKE_LARGE.display(machine.getLocation().clone().add(0.5D, y = y + 0.1D, z = z + 0.05D));
-            }
-
-            Random random = new Random();
-
-            if (random.nextInt(100 + 1) <= 25) {
-                machine.setIntegrity(machine.getIntegrity() - 1);
-            }
-
-            if (machine.getIntegrity() <= 60) { // 60% of integrity = chance of stop machine and lost all drops
-                if (random.nextInt(100 + 1) <= 5) {
-                    machine.switchStatus();
-                    machine.setDrops(BigInteger.ZERO);
-                    machine.getLocation().getWorld().playSound(machine.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 10f, 10f);
-
-                    ParticleEffect.EXPLOSION_HUGE.display(machine.getLocation().clone().add(0.5D, 0D, 0.5D));
-                }
             }
         });
     }

@@ -13,6 +13,7 @@ import com.zpedroo.voltzmachines.tasks.MachineTask;
 import com.zpedroo.voltzmachines.tasks.QuotationTask;
 import com.zpedroo.voltzmachines.tasks.SaveTask;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
+import com.zpedroo.voltzmachines.utils.formatter.TimeFormatter;
 import com.zpedroo.voltzmachines.utils.item.Items;
 import com.zpedroo.voltzmachines.utils.menu.Menus;
 import org.bukkit.Bukkit;
@@ -46,6 +47,7 @@ public class VoltzMachines extends JavaPlugin {
         new Menus();
         new Items();
         new NumberFormatter(getConfig());
+        new TimeFormatter();
 
         registerCommands();
         registerListeners();
@@ -58,7 +60,7 @@ public class VoltzMachines extends JavaPlugin {
             MachineManager.getInstance().saveAll();
             DBConnection.getInstance().closeConnection();
         } catch (Exception ex) {
-            getLogger().log(Level.SEVERE, "An error ocurred while trying to save data!");
+            getLogger().log(Level.SEVERE, "An error occurred while trying to save data!");
             ex.printStackTrace();
         }
     }

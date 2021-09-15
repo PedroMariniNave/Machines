@@ -4,7 +4,6 @@ import com.zpedroo.voltzmachines.hooks.WorldGuardHook;
 import com.zpedroo.voltzmachines.machine.Machine;
 import com.zpedroo.voltzmachines.machine.PlayerMachine;
 import com.zpedroo.voltzmachines.managers.MachineManager;
-import com.zpedroo.voltzmachines.objects.Manager;
 import com.zpedroo.voltzmachines.utils.config.Messages;
 import com.zpedroo.voltzmachines.utils.config.Settings;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
@@ -37,6 +36,8 @@ public class MachineListeners implements Listener {
         if (event.getItemInHand() == null || event.getItemInHand().getType().equals(Material.AIR)) return;
 
         final ItemStack item = event.getItemInHand().clone();
+        if (item == null || item.getType().equals(Material.AIR)) return;
+
         NBTItem nbt = new NBTItem(item);
         if (nbt.hasKey("MachinesFuel") || nbt.hasKey("MachinesInfiniteFuel") || nbt.hasKey("MachinesRepair")) event.setCancelled(true);
         if (!nbt.hasKey("MachinesAmount")) return;
@@ -95,13 +96,17 @@ public class MachineListeners implements Listener {
                 overLimit = stack.subtract(machine.getMaxStack());
             } else overLimit = BigInteger.ZERO;
 
-            playerMachine = new PlayerMachine(block.getLocation(), player.getUniqueId(), stack.subtract(overLimit), BigInteger.ZERO, BigInteger.ZERO, integrity, machine, new ArrayList<>(), false);
+            playerMachine = new PlayerMachine(block.getLocation(), player.getUniqueId(), stack.subtract(overLimit), BigInteger.ZERO, BigInteger.ZERO, integrity, machine, new ArrayList<>(), false, false);
             playerMachine.cache();
             playerMachine.setQueueUpdate(true);
         }
 
         item.setAmount(1);
-        player.getInventory().removeItem(item);
+        if (player.getInventory().getItemInOffHand().isSimilar(item)) {
+            player.getInventory().setItemInOffHand(null);
+        } else {
+            player.getInventory().removeItem(item);
+        }
         if (overLimit.compareTo(BigInteger.ZERO) >= 1) player.getInventory().addItem(machine.getItem(overLimit, integrity));
     }
 
@@ -129,16 +134,28 @@ public class MachineListeners implements Listener {
             NBTItem nbt = new NBTItem(item);
 
             if (nbt.hasKey("MachinesInfiniteFuel")) {
-                if (machine.isInfinite()) return;
+                if (machine.hasInfiniteFuel()) return;
 
-                machine.setInfinite(true);
+                machine.setInfiniteFuel(true);
                 item.setAmount(1);
                 player.playSound(player.getLocation(), Sound.BLOCK_LAVA_AMBIENT, 0.5f, 10f);
                 player.getInventory().removeItem(item);
                 return;
             }
 
+            if (nbt.hasKey("MachinesInfiniteRepair")) {
+                if (machine.hasInfiniteIntegrity()) return;
+
+                machine.setInfiniteIntegrity(true);
+                item.setAmount(1);
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 0.5f, 0.5f);
+                player.getInventory().removeItem(item);
+                return;
+            }
+
             if (nbt.hasKey("MachinesFuel")) {
+                if (machine.hasInfiniteFuel()) return;
+
                 BigInteger amount = new BigInteger(nbt.getString("MachinesFuel"));
 
                 machine.addFuel(amount);
@@ -149,11 +166,10 @@ public class MachineListeners implements Listener {
             }
 
             if (nbt.hasKey("MachinesRepair")) {
+                if (machine.getIntegrity() >= 100 || machine.hasInfiniteIntegrity()) return;
+
                 Integer percentage = nbt.getInteger("MachinesRepair");
-
                 Integer overLimit = 0;
-
-                if (machine.getIntegrity() >= 100) return;
 
                 if (machine.getIntegrity() + percentage > 100) {
                     overLimit = percentage - (100 - machine.getIntegrity());
@@ -202,8 +218,6 @@ public class MachineListeners implements Listener {
             toGive = machine.getStack().subtract(machine.getStack().multiply(BigInteger.valueOf(Settings.TAX_REMOVE_STACK)).divide(BigInteger.valueOf(100)));
         }
 
-        machine.delete();
-        player.getInventory().addItem(machine.getMachine().getItem(toGive, machine.getIntegrity()));
         if (toGive.compareTo(machine.getStack()) < 0) {
             player.sendMessage(StringUtils.replaceEach(Messages.INCORRECT_PICKAXE, new String[]{
                     "{lost}"
@@ -212,9 +226,18 @@ public class MachineListeners implements Listener {
             }));
         }
 
-        if (machine.isInfinite()) {
+        if (machine.hasInfiniteFuel()) {
             player.getInventory().addItem(Items.getInstance().getInfiniteFuel());
         }
+
+        if (machine.hasInfiniteIntegrity()) {
+            player.getInventory().addItem(Items.getInstance().getInfiniteRepair());
+        }
+
+        if (machine.getDrops().signum() > 0) machine.sellDrops(player);
+
+        machine.delete();
+        player.getInventory().addItem(machine.getMachine().getItem(toGive, machine.getIntegrity()));
 
         if (machine.getFuel().signum() <= 0) return;
 

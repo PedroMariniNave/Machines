@@ -62,31 +62,31 @@ public class ItemBuilder {
         return build(file, where, null, null, actions);
     }
 
-    public static ItemBuilder build(FileConfiguration file, String where, String[] placeholders, String[] replacers, List<InventoryUtils.Action> actions) {
+    public static ItemBuilder build(FileConfiguration file, String where, String[] placeholders, String[] replaces, List<InventoryUtils.Action> actions) {
         String type = StringUtils.replace(file.getString(where + ".type"), " ", "").toUpperCase();
-        short data = Short.parseShort(file.getString(where + ".data", "0"));
+        short data = (short) (file.contains(where + ".data") ? file.getInt(where + ".data") : 0);
         int amount = file.getInt(where + ".amount", 1);
         int slot = file.getInt(where + ".slot", 0);
 
-        Material material = Material.getMaterial(StringUtils.replaceEach(type, placeholders, replacers));
+        Material material = Material.getMaterial(StringUtils.replaceEach(type, placeholders, replaces));
         Validate.notNull(material, "Material cannot be null! Check your item configs.");
 
         ItemBuilder builder = new ItemBuilder(material, amount, data, slot, actions);
 
         if (file.contains(where + ".name")) {
             String name = ChatColor.translateAlternateColorCodes('&', file.getString(where + ".name"));
-            builder.setName(StringUtils.replaceEach(name, placeholders, replacers));
+            builder.setName(StringUtils.replaceEach(name, placeholders, replaces));
         }
 
         if (file.contains(where + ".lore")) {
-            builder.setLore(file.getStringList(where + ".lore"), placeholders, replacers);
+            builder.setLore(file.getStringList(where + ".lore"), placeholders, replaces);
         }
 
         if (file.contains(where + ".owner")) {
             String owner = file.getString(where + ".owner");
 
-            if (owner.length() <= 16) { // max player name lenght
-                builder.setSkullOwner(StringUtils.replaceEach(owner, placeholders, replacers));
+            if (owner.length() <= 16) {
+                builder.setSkullOwner(StringUtils.replaceEach(owner, placeholders, replaces));
             } else {
                 builder.setCustomTexture(owner);
             }
@@ -172,6 +172,7 @@ public class ItemBuilder {
     }
 
     private void setSkullOwner(String owner) {
+        if (!StringUtils.contains(item.getType().toString(), "PLAYER_HEAD")) return;
         if (owner == null || owner.isEmpty()) return;
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
@@ -182,29 +183,28 @@ public class ItemBuilder {
     }
 
     private void setCustomTexture(String base64) {
+        if (!StringUtils.contains(item.getType().toString(), "PLAYER_HEAD")) return;
         if (base64 == null || base64.isEmpty()) return;
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        mutateItemMeta(meta, base64);
+        setCustomTexture(meta, base64);
         item.setItemMeta(meta);
     }
 
-    private void mutateItemMeta(SkullMeta meta, String b64) {
+    private void setCustomTexture(SkullMeta meta, String base64) {
         try {
             if (metaSetProfileMethod == null) {
                 metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
                 metaSetProfileMethod.setAccessible(true);
             }
-            metaSetProfileMethod.invoke(meta, makeProfile(b64));
+            metaSetProfileMethod.invoke(meta, createProfile(base64));
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            // if in an older API where there is no setProfile method,
-            // we set the profile field directly.
             try {
                 if (metaProfileField == null) {
                     metaProfileField = meta.getClass().getDeclaredField("profile");
                     metaProfileField.setAccessible(true);
                 }
-                metaProfileField.set(meta, makeProfile(b64));
+                metaProfileField.set(meta, createProfile(base64));
 
             } catch (NoSuchFieldException | IllegalAccessException ex2) {
                 ex2.printStackTrace();
@@ -212,14 +212,14 @@ public class ItemBuilder {
         }
     }
 
-    private GameProfile makeProfile(String b64) {
-        // random uuid based on the b64 string
-        UUID id = new UUID(
-                b64.substring(b64.length() - 20).hashCode(),
-                b64.substring(b64.length() - 10).hashCode()
+    private GameProfile createProfile(String base64) {
+        UUID uuid = new UUID(
+                base64.substring(base64.length() - 20).hashCode(),
+                base64.substring(base64.length() - 10).hashCode()
         );
-        GameProfile profile = new GameProfile(id, "Player");
-        profile.getProperties().put("textures", new Property("textures", b64));
+        GameProfile profile = new GameProfile(uuid, "Player");
+        profile.getProperties().put("textures", new Property("textures", base64));
+
         return profile;
     }
 

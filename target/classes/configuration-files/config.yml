@@ -74,6 +74,11 @@ Messages:
   add-friend:
     - '&6&lVoltz&f&lMC &8&l➜ &7Digite no chat o nick do jogador!'
 
+Titles:
+  when-sell:
+    title: ''
+    subtitle: '&e&l+{value} ⛃'
+
 Fuel:
   type: PLAYER_HEAD
   owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2FmNTliOGFhMGY4MzU0NmVmMGQxNzhjY2Y4N2U3ZWQ4OGNmNzg1OGNhYWU3OWIzNjMzY2JkNzViNjUwNTI1ZiJ9fX0=
@@ -103,10 +108,20 @@ Pickaxe:
 Repair:
   type: PLAYER_HEAD
   owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWVmNWFjZjEzNGZhOTUyZjEzZmRmMGIzODk5MDYwY2MxOGViYzBhOTcxMzQ3ZTQ1YTMxZWNmOTVhNGIwYjMxYyJ9fX0=
-  name: '&6Reparador de Máquinas &7[&f+{percentage}%&7]'
+  name: '&4Reparador de Máquinas &7[&f+{percentage}%&7]'
   lore:
     - '&7Use esse item para restaurar'
     - '&7a integridade de suas máquinas!'
+
+Infinite-Repair:
+  type: PLAYER_HEAD
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGE3ZDU0Y2E0NWEzOThjMzY0Y2ViYmZmYjUzOTBjZTVlMDM0NWUwYzdiYzVlODYzYWNhYmY1N2QxMzQyYzRiZCJ9fX0=
+  name: '&4Reparador de Máquinas ∞'
+  lore:
+    - '&7Use esse item para restaurar'
+    - '&7a integridade de seus máquinas!'
+    - ''
+    - '&7Esse reparador é infinito!'
 
 Gift:
   type: PLAYER_HEAD
