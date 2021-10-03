@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,7 +12,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -26,8 +32,8 @@ public class ItemBuilder {
     private Integer slot;
     private List<InventoryUtils.Action> actions;
 
-    private static Method metaSetProfileMethod;
-    private static Field metaProfileField;
+    private Method metaSetProfileMethod;
+    private Field metaProfileField;
 
     public ItemBuilder(Material material, int amount, short durability, Integer slot, List<InventoryUtils.Action> actions) {
         if (StringUtils.equals(material.toString(), "PLAYER_HEAD")) {
@@ -62,33 +68,45 @@ public class ItemBuilder {
         return build(file, where, null, null, actions);
     }
 
-    public static ItemBuilder build(FileConfiguration file, String where, String[] placeholders, String[] replaces, List<InventoryUtils.Action> actions) {
-        String type = StringUtils.replace(file.getString(where + ".type"), " ", "").toUpperCase();
-        short data = (short) (file.contains(where + ".data") ? file.getInt(where + ".data") : 0);
+    public static ItemBuilder build(FileConfiguration file, String where, String[] placeholders, String[] replacers, List<InventoryUtils.Action> actions) {
+        String type = StringUtils.replaceEach(file.getString(where + ".type"), placeholders, replacers);
+        short data = Short.parseShort(file.getString(where + ".data", "0"));
         int amount = file.getInt(where + ".amount", 1);
         int slot = file.getInt(where + ".slot", 0);
 
-        Material material = Material.getMaterial(StringUtils.replaceEach(type, placeholders, replaces));
-        Validate.notNull(material, "Material cannot be null! Check your item configs.");
+        Material material = Material.getMaterial(type);
+        Validate.notNull(material, "Material cannot be null! Check your item configs. Invalid material: " + type);
 
         ItemBuilder builder = new ItemBuilder(material, amount, data, slot, actions);
 
         if (file.contains(where + ".name")) {
             String name = ChatColor.translateAlternateColorCodes('&', file.getString(where + ".name"));
-            builder.setName(StringUtils.replaceEach(name, placeholders, replaces));
+            builder.setName(StringUtils.replaceEach(name, placeholders, replacers));
         }
 
         if (file.contains(where + ".lore")) {
-            builder.setLore(file.getStringList(where + ".lore"), placeholders, replaces);
+            builder.setLore(file.getStringList(where + ".lore"), placeholders, replacers);
         }
 
         if (file.contains(where + ".owner")) {
             String owner = file.getString(where + ".owner");
 
-            if (owner.length() <= 16) {
-                builder.setSkullOwner(StringUtils.replaceEach(owner, placeholders, replaces));
+            if (owner.length() <= 16) { // max player name lenght
+                builder.setSkullOwner(StringUtils.replaceEach(owner, placeholders, replacers));
             } else {
                 builder.setCustomTexture(owner);
+            }
+        }
+
+        if (file.contains(where + ".potions")) {
+            for (String potion : file.getConfigurationSection(where + ".potions").getKeys(false)) {
+                if (potion == null) continue;
+
+                String potionType = file.getString(where + ".potions." + potion + ".type");
+                int duration = file.getInt(where + ".potions." + potion + ".duration") * 20;
+                int amplifier = file.getInt(where + ".potions." + potion + ".amplifier") - 1;
+
+                builder.addPotion(potionType, duration, amplifier);
             }
         }
 
@@ -113,6 +131,10 @@ public class ItemBuilder {
 
         if (file.contains(where + ".custom-model-data")) {
             builder.setCustomModelData(file.getInt(where + ".custom-model-data"));
+        }
+
+        if (file.contains(where + ".hide-attributes") && file.getBoolean(where + ".hide-attributes")) {
+            builder.hideAttributes();
         }
 
         return builder;
@@ -154,6 +176,24 @@ public class ItemBuilder {
         item.setItemMeta(meta);
     }
 
+    private void addPotion(String type, int duration, int amplifier) {
+        PotionMeta meta = (PotionMeta) item.getItemMeta();
+        if (meta == null) return;
+
+        PotionEffectType potionEffectType = PotionEffectType.getByName(type);
+        if (potionEffectType == null) return;
+
+        PotionEffect potionEffect = new PotionEffect(potionEffectType, duration, amplifier);
+
+        meta.addCustomEffect(potionEffect, true);
+
+        PotionType potionType = PotionType.getByEffect(potionEffectType);
+        if (potionType != null) {
+            meta.setBasePotionData(new PotionData(potionType, true, false));
+        }
+        item.setItemMeta(meta);
+    }
+
     private void setGlow() {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
@@ -171,19 +211,26 @@ public class ItemBuilder {
         item.setItemMeta(meta);
     }
 
+    private void hideAttributes() {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        item.setItemMeta(meta);
+    }
+
     private void setSkullOwner(String owner) {
-        if (!StringUtils.contains(item.getType().toString(), "PLAYER_HEAD")) return;
         if (owner == null || owner.isEmpty()) return;
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         if (meta == null) return;
 
-        meta.setOwner(owner);
+        meta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
         item.setItemMeta(meta);
     }
 
     private void setCustomTexture(String base64) {
-        if (!StringUtils.contains(item.getType().toString(), "PLAYER_HEAD")) return;
         if (base64 == null || base64.isEmpty()) return;
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
@@ -213,13 +260,12 @@ public class ItemBuilder {
     }
 
     private GameProfile createProfile(String base64) {
-        UUID uuid = new UUID(
+        UUID id = new UUID(
                 base64.substring(base64.length() - 20).hashCode(),
                 base64.substring(base64.length() - 10).hashCode()
         );
-        GameProfile profile = new GameProfile(uuid, "Player");
+        GameProfile profile = new GameProfile(id, "Player");
         profile.getProperties().put("textures", new Property("textures", base64));
-
         return profile;
     }
 

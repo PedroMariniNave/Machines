@@ -3,8 +3,6 @@ Machine-Settings:
   type-translated: Esmeralda
   display-name: '&2Máquina de Esmeralda'
   drops:
-    price: 0
-    previous: 0
     delay: 10
     amount: 10000
   max-stack: 100000000
@@ -19,6 +17,7 @@ Machine-Settings:
       - '&7gerar esmeraldas!'
       - ''
       - '&7Integridade: &f{integrity}'
+
 Machine-Menu:
   title: Máquina de Esmeralda
   size: 36

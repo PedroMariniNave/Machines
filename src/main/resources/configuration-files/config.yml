@@ -14,7 +14,6 @@ Settings:
   save-interval: 600 # em segundos
   machine-update: 200 # em ticks
   tax-remove-stack: 10 # em porcentagem
-  next-update: 0
   hologram:
     - '&6&lMÁQUINA'
     - ''
@@ -29,8 +28,12 @@ Settings:
 Messages:
   enabled: '&aLigado'
   disabled: '&cDesligado'
-  true: '&aSim'
-  false: '&cNão'
+  'true': '&aSim'
+  'false': '&cNão'
+  zero-machines-fuel: '&6&lVoltz&f&lMC &8&l➜ &cVocê não possui máquinas para abastecer!'
+  zero-machines-repair: '&6&lVoltz&f&lMC &8&l➜ &cVocê não possui máquinas para reparar!'
+  successful-fueled: '&6&lVoltz&f&lMC &8&l➜ &7Você abasteceu &f{machines} &7máquinas, totalizando &f{fuel} litros &7para cada!'
+  successful-repaired: '&6&lVoltz&f&lMC &8&l➜ &7Você reparou &f{machines} &7máquinas, totalizando em média &f{repair}% &7para cada!'
   remove-stack-min: '&6&lVoltz&f&lMC &8&l➜ &cA quantia precisa ser acima de {tax}!'
   remove-stack-successful: '&6&lVoltz&f&lMC &8&l➜ &7Stacks removidos com sucesso! &f{lost} &7máquinas foram destruídas nesse processo.'
   incorrect-pickaxe: '&6&lVoltz&f&lMC &8&l➜ &c{lost} máquinas foram destruídas por não ter usado uma ferramenta ideal de remoção!'
@@ -140,7 +143,7 @@ Previous-Page:
   type: ARROW
   name: '&cPágina Anterior'
 
-TimeFormatter:
+Time-Formatter:
   second: segundo
   seconds: segundos
   minute: minuto
@@ -151,7 +154,7 @@ TimeFormatter:
   days: dias
   now: agora
 
-NumberFormatter:
+Number-Formatter:
   - "k"
   - "M"
   - "B"

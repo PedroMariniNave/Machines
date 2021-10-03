@@ -1,13 +1,13 @@
-package com.zpedroo.voltzmachines.machine.cache;
+package com.zpedroo.voltzmachines.managers.cache;
 
-import com.zpedroo.voltzmachines.machine.Machine;
-import com.zpedroo.voltzmachines.machine.PlayerMachine;
+import com.zpedroo.voltzmachines.objects.Machine;
+import com.zpedroo.voltzmachines.objects.PlayerMachine;
 import org.bukkit.Location;
 
 import java.math.BigInteger;
 import java.util.*;
 
-public class MachineDataCache {
+public class DataCache {
 
     private Map<String, Machine> machines;
     private Map<Location, PlayerMachine> playerMachines;
@@ -15,7 +15,7 @@ public class MachineDataCache {
     private Map<UUID, BigInteger> topMachines;
     private Set<Location> deletedMachines;
 
-    public MachineDataCache() {
+    public DataCache() {
         this.machines = new HashMap<>(32);
         this.playerMachines = new HashMap<>(5120);
         this.deletedMachines = new HashSet<>(5120);
@@ -49,7 +49,7 @@ public class MachineDataCache {
         return deletedMachines;
     }
 
-    public void setPlayerMachines(HashMap<Location, PlayerMachine> playerMachines) {
+    public void setPlayerMachines(Map<Location, PlayerMachine> playerMachines) {
         this.playerMachines = playerMachines;
     }
 

@@ -1,10 +1,11 @@
 package com.zpedroo.voltzmachines.utils.menu;
 
 import com.zpedroo.voltzmachines.VoltzMachines;
-import com.zpedroo.voltzmachines.machine.Machine;
-import com.zpedroo.voltzmachines.machine.PlayerMachine;
+import com.zpedroo.voltzmachines.managers.DataManager;
+import com.zpedroo.voltzmachines.objects.Machine;
+import com.zpedroo.voltzmachines.objects.PlayerMachine;
 import com.zpedroo.voltzmachines.managers.MachineManager;
-import com.zpedroo.voltzmachines.FileUtils;
+import com.zpedroo.voltzmachines.utils.FileUtils;
 import com.zpedroo.voltzmachines.listeners.PlayerChatListener;
 import com.zpedroo.voltzmachines.listeners.PlayerGeneralListeners;
 import com.zpedroo.voltzmachines.objects.Manager;
@@ -68,17 +69,17 @@ public class Menus {
             String action = FileUtils.get().getString(file, "Inventory.items." + items + ".action");
 
             switch (action.toUpperCase()) {
-                case "OPEN_MACHINES" -> inventoryUtils.addAction(inventory, slot, () -> {
-                    openPlayerMachinesMenu(player, MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(player.getUniqueId()));
+                case "MACHINES" -> inventoryUtils.addAction(inventory, item, () -> {
+                    openPlayerMachinesMenu(player, DataManager.getInstance().getCache().getPlayerMachinesByUUID(player.getUniqueId()));
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
                 }, InventoryUtils.ActionType.ALL_CLICKS);
 
-                case "OPEN_SHOP" -> inventoryUtils.addAction(inventory, slot, () -> {
+                case "SHOP" -> inventoryUtils.addAction(inventory, item, () -> {
                     openShopMenu(player);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
                 }, InventoryUtils.ActionType.ALL_CLICKS);
 
-                case "OPEN_TOP" -> inventoryUtils.addAction(inventory, slot, () -> {
+                case "TOP" -> inventoryUtils.addAction(inventory, item, () -> {
                     openTopMachinesMenu(player);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
                 }, InventoryUtils.ActionType.ALL_CLICKS);
@@ -130,7 +131,7 @@ public class Menus {
             String action = file.getString("Machine-Menu.items." + items + ".action", "NULL");
 
             switch (action.toUpperCase()) {
-                case "SWITCH" -> inventoryUtils.addAction(inventory, slot, () -> {
+                case "SWITCH" -> inventoryUtils.addAction(inventory, item, () -> {
                     if (!machine.hasInfiniteFuel() && machine.getFuel().signum() <= 0) {
                         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.5f);
                         return;
@@ -146,7 +147,7 @@ public class Menus {
                     player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 0.5f, 100f);
                 }, InventoryUtils.ActionType.ALL_CLICKS);
 
-                case "SELL_DROPS" -> inventoryUtils.addAction(inventory, slot, () -> {
+                case "SELL_DROPS" -> inventoryUtils.addAction(inventory, item, () -> {
                     if (!player.getUniqueId().equals(machine.getOwnerUUID()) && (manager != null && !manager.can(Permission.SELL_DROPS))) {
                         player.sendMessage(NEED_PERMISSION);
                         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.5f);
@@ -163,12 +164,12 @@ public class Menus {
                     player.playSound(player.getLocation(), Sound.ENTITY_HORSE_ARMOR, 0.5f, 0.5f);
                 }, InventoryUtils.ActionType.ALL_CLICKS);
 
-                case "MANAGERS" -> inventoryUtils.addAction(inventory, slot, () -> {
+                case "MANAGERS" -> inventoryUtils.addAction(inventory, item, () -> {
                     openManagersMenu(player, machine);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
                 }, InventoryUtils.ActionType.ALL_CLICKS);
 
-                case "REMOVE_STACK" -> inventoryUtils.addAction(inventory, slot, () -> {
+                case "REMOVE_STACK" -> inventoryUtils.addAction(inventory, item, () -> {
                     if (!player.getUniqueId().equals(machine.getOwnerUUID()) && (manager != null && !manager.can(Permission.REMOVE_STACK))) {
                         player.sendMessage(NEED_PERMISSION);
                         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.5f);
@@ -203,10 +204,12 @@ public class Menus {
 
         Inventory inventory = Bukkit.createInventory(null, size, title);
 
-        int pos = 0;
         String[] topSlots = FileUtils.get().getString(file, "Inventory.slots").replace(" ", "").split(",");
 
-        for (Map.Entry<UUID, BigInteger> entry : MachineManager.getInstance().getDataCache().getTopMachines().entrySet()) {
+        Map<UUID, BigInteger> topMachines = DataManager.getInstance().getCache().getTopMachines();
+        int pos = 0;
+
+        for (Map.Entry<UUID, BigInteger> entry : topMachines.entrySet()) {
             UUID uuid = entry.getKey();
             BigInteger stack = entry.getValue();
 
@@ -220,80 +223,14 @@ public class Menus {
                     String.valueOf(++pos)
             }).build();
 
-            int slot = Integer.parseInt(topSlots[pos]);
+            int slot = Integer.parseInt(topSlots[pos-1]);
 
-            inventoryUtils.addAction(inventory, slot, () -> {
-                openOtherMachinesMenu(player, uuid);
-            }, InventoryUtils.ActionType.ALL_CLICKS);
+            inventoryUtils.addAction(inventory, item, null, InventoryUtils.ActionType.ALL_CLICKS);
 
             inventory.setItem(slot, item);
         }
 
         player.openInventory(inventory);
-    }
-
-    public void openOtherMachinesMenu(Player player, UUID targetUUID) {
-        FileUtils.Files file = FileUtils.Files.OTHER_MACHINES;
-        List<PlayerMachine> machines = MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(targetUUID);
-
-        String title = ChatColor.translateAlternateColorCodes('&', StringUtils.replaceEach(FileUtils.get().getString(file, "Inventory.title"), new String[]{
-                "{target}"
-        }, new String[]{
-                Bukkit.getOfflinePlayer(targetUUID).getName()
-        }));
-        int size = FileUtils.get().getInt(file, "Inventory.size");
-
-        Inventory inventory = Bukkit.createInventory(null, size, title);
-        List<ItemBuilder> builders = new ArrayList<>(machines.size());
-
-        if (machines.size() <= 0) {
-            ItemStack item = ItemBuilder.build(FileUtils.get().getFile(file).get(), "Nothing").build();
-            int slot = FileUtils.get().getInt(file, "Nothing.slot");
-
-            inventory.setItem(slot, item);
-        } else {
-            String[] slots = FileUtils.get().getString(file, "Inventory.slots").replace(" ", "").split(",");
-            int i = -1;
-
-            for (PlayerMachine machine : machines) {
-                if (++i >= slots.length) i = 0;
-
-                ItemStack item = machine.getMachine().getDisplayItem();
-                int slot = Integer.parseInt(slots[i]);
-                ItemMeta meta = item.getItemMeta();
-                List<String> lore = new ArrayList<>(8);
-                List<InventoryUtils.Action> actions = new ArrayList<>(1);
-
-                for (String toAdd : FileUtils.get().getStringList(file, "Item-Lore")) {
-                    lore.add(ChatColor.translateAlternateColorCodes('&', StringUtils.replaceEach(toAdd, new String[]{
-                            "{stack}",
-                            "{drops}",
-                            "{fuel}",
-                            "{integrity}",
-                            "{status}"
-                    }, new String[]{
-                            NumberFormatter.getInstance().format(machine.getStack()),
-                            NumberFormatter.getInstance().format(machine.getDrops()),
-                            machine.hasInfiniteFuel() ? "∞" : NumberFormatter.getInstance().format(machine.getFuel()),
-                            machine.getIntegrity().toString() + "%",
-                            machine.isEnabled() ? ENABLED : DISABLED
-                    })));
-                }
-
-                actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, null)); // no action
-
-                meta.setDisplayName(machine.getMachine().getDisplayName());
-                meta.setLore(lore);
-                item.setItemMeta(meta);
-
-                builders.add(ItemBuilder.build(item, slot, actions));
-            }
-        }
-
-        int nextPageSlot = FileUtils.get().getInt(file, "Inventory.next-page-slot");
-        int previousPageSlot = FileUtils.get().getInt(file, "Inventory.previous-page-slot");
-
-        InventoryBuilder.build(player, inventory, title, builders, nextPageSlot, previousPageSlot, nextPageItem, previousPageItem);
     }
 
     public void openPlayerMachinesMenu(Player player, List<PlayerMachine> machines) {
@@ -334,7 +271,7 @@ public class Menus {
                             NumberFormatter.getInstance().format(machine.getStack()),
                             NumberFormatter.getInstance().format(machine.getDrops()),
                             machine.hasInfiniteFuel() ? "∞" : NumberFormatter.getInstance().format(machine.getFuel()),
-                            machine.getIntegrity().toString() + "%",
+                            machine.hasInfiniteIntegrity() ? "∞" : machine.getIntegrity().toString() + "%",
                             machine.isEnabled() ? ENABLED : DISABLED
                     })));
                 }
@@ -345,7 +282,7 @@ public class Menus {
 
                 int slot = Integer.parseInt(slots[i]);
 
-                actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, () -> {
+                actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, item, () -> {
                     openMachineMenu(player, machine);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
                 }));
@@ -364,7 +301,7 @@ public class Menus {
         int sellAllSlot = FileUtils.get().getInt(file, "Sell-All.slot");
 
         inventory.setItem(sellAllSlot, sellAll);
-        inventoryUtils.addAction(inventory, sellAllSlot, () -> {
+        inventoryUtils.addAction(inventory, sellAll, () -> {
             BigInteger dropsPrice = getTotalDropsPrice(player);
 
             if (dropsPrice.signum() <= 0) {
@@ -372,7 +309,7 @@ public class Menus {
                 return;
             }
 
-            for (PlayerMachine machine : MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(player.getUniqueId())) {
+            for (PlayerMachine machine : DataManager.getInstance().getCache().getPlayerMachinesByUUID(player.getUniqueId())) {
                 if (machine == null) continue;
                 if (machine.getDrops().signum() <= 0) continue;
 
@@ -387,8 +324,8 @@ public class Menus {
         int enableAllSlot = FileUtils.get().getInt(file, "Enable-All.slot");
 
         inventory.setItem(enableAllSlot, enableAll);
-        inventoryUtils.addAction(inventory, enableAllSlot, () -> {
-            for (PlayerMachine machine : MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(player.getUniqueId())) {
+        inventoryUtils.addAction(inventory, enableAll, () -> {
+            for (PlayerMachine machine : DataManager.getInstance().getCache().getPlayerMachinesByUUID(player.getUniqueId())) {
                 if (machine == null) continue;
                 if (!machine.hasInfiniteFuel() && machine.getFuel().signum() <= 0) continue;
 
@@ -403,8 +340,8 @@ public class Menus {
         int disableAllSlot = FileUtils.get().getInt(file, "Disable-All.slot");
 
         inventory.setItem(disableAllSlot, disableAll);
-        inventoryUtils.addAction(inventory, disableAllSlot, () -> {
-            for (PlayerMachine machine : MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(player.getUniqueId())) {
+        inventoryUtils.addAction(inventory, disableAll, () -> {
+            for (PlayerMachine machine : DataManager.getInstance().getCache().getPlayerMachinesByUUID(player.getUniqueId())) {
                 if (machine == null) continue;
 
                 machine.setStatus(false);
@@ -473,7 +410,7 @@ public class Menus {
                     meta.setLore(lore);
                     item.setItemMeta(meta);
 
-                    actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, () -> {
+                    actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, item, () -> {
                         openPermissionsMenu(player, machine, manager);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
                     }));
@@ -509,7 +446,7 @@ public class Menus {
         int backSlot = FileUtils.get().getInt(file, "Back.slot");
 
         inventory.setItem(backSlot, back);
-        inventoryUtils.addAction(inventory, backSlot, () -> {
+        inventoryUtils.addAction(inventory, back, () -> {
             openMachineMenu(player, machine);
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
         }, InventoryUtils.ActionType.ALL_CLICKS);
@@ -552,12 +489,12 @@ public class Menus {
                 String action = FileUtils.get().getString(file, "Inventory.items." + str + ".action");
 
                 switch (action.toUpperCase()) {
-                    case "BACK" -> actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, () -> {
+                    case "BACK" -> actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, item, () -> {
                         openManagersMenu(player, machine);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2f, 2f);
                     }));
 
-                    case "REMOVE" -> actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, () -> {
+                    case "REMOVE" -> actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, item, () -> {
                         machine.getManagers().remove(manager);
                         machine.setQueueUpdate(true);
                         openManagersMenu(player, machine);
@@ -569,7 +506,7 @@ public class Menus {
 
                 final Permission finalPermission = permission;
 
-                actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, () -> {
+                actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, item, () -> {
                     if (!player.getUniqueId().equals(machine.getOwnerUUID())) {
                         player.sendMessage(ONLY_OWNER);
                         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.5f);
@@ -603,7 +540,7 @@ public class Menus {
         for (String str : FileUtils.get().getSection(file, "Inventory.items")) {
             if (++i >= slots.length) i = 0;
 
-            Machine machine = MachineManager.getInstance().getMachine(str);
+            Machine machine = DataManager.getInstance().getMachine(str);
             if (machine == null) continue;
 
             List<InventoryUtils.Action> actions = new ArrayList<>(1);
@@ -625,7 +562,7 @@ public class Menus {
             }).build();
             int slot = Integer.parseInt(slots[i]);
 
-            actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, () -> {
+            actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, item, () -> {
                 PlayerChatListener.getPlayerChat().put(player, new PlayerChat(player, machine, price, Action.BUY_MACHINE));
                 player.closeInventory();
                 clearChat(player);
@@ -671,7 +608,7 @@ public class Menus {
         for (String str : FileUtils.get().getSection(file, "Inventory.items")) {
             if (++i >= slots.length) i = 0;
 
-            Machine machine = MachineManager.getInstance().getMachine(str);
+            Machine machine = DataManager.getInstance().getMachine(str);
             if (machine == null) continue;
 
             List<InventoryUtils.Action> actions = new ArrayList<>(1);
@@ -691,7 +628,7 @@ public class Menus {
             }).build();
             int slot = Integer.parseInt(slots[i]);
 
-            actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, slot, () -> {
+            actions.add(new InventoryUtils.Action(InventoryUtils.ActionType.ALL_CLICKS, item, () -> {
                 PlayerGeneralListeners.getChoosingGift().remove(player);
                 player.getInventory().addItem(machine.getItem(machinesAmount, 100));
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 10f);
@@ -710,7 +647,7 @@ public class Menus {
     private BigInteger getTotalDrops(Player player) {
         BigInteger dropsAmount = BigInteger.ZERO;
 
-        for (PlayerMachine machine : MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(player.getUniqueId())) {
+        for (PlayerMachine machine : DataManager.getInstance().getCache().getPlayerMachinesByUUID(player.getUniqueId())) {
             if (machine == null) continue;
             if (machine.getDrops().signum() <= 0) continue;
 
@@ -723,7 +660,7 @@ public class Menus {
     private BigInteger getTotalDropsPrice(Player player) {
         BigInteger dropsPrice = BigInteger.ZERO;
 
-        for (PlayerMachine machine : MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(player.getUniqueId())) {
+        for (PlayerMachine machine : DataManager.getInstance().getCache().getPlayerMachinesByUUID(player.getUniqueId())) {
             if (machine == null) continue;
             if (machine.getDrops().signum() <= 0) continue;
 

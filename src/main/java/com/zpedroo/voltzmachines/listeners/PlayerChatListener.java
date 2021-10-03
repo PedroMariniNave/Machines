@@ -1,8 +1,9 @@
 package com.zpedroo.voltzmachines.listeners;
 
+import com.zpedroo.voltzmachines.VoltzMachines;
 import com.zpedroo.voltzmachines.hooks.VaultHook;
-import com.zpedroo.voltzmachines.machine.Machine;
-import com.zpedroo.voltzmachines.machine.PlayerMachine;
+import com.zpedroo.voltzmachines.objects.Machine;
+import com.zpedroo.voltzmachines.objects.PlayerMachine;
 import com.zpedroo.voltzmachines.objects.Manager;
 import com.zpedroo.voltzmachines.objects.PlayerChat;
 import com.zpedroo.voltzmachines.utils.config.Messages;
@@ -49,7 +50,7 @@ public class PlayerChatListener implements Listener {
         switch (action) {
             case BUY_MACHINE -> {
                 BigInteger price = playerChat.getPrice();
-                BigInteger money = new BigInteger(String.format("%.0f", VaultHook.getMoney(player)));
+                BigInteger money = new BigInteger(String.format("%.0f", VaultHook.get().getMoney(player)));
                 BigInteger amount = null;
                 if (StringUtils.equals(msg, "*")) {
                     amount = money.divide(price);
@@ -59,7 +60,7 @@ public class PlayerChatListener implements Listener {
                         return;
                     }
 
-                    VaultHook.removeMoney(player, price.multiply(amount).doubleValue());
+                    VaultHook.get().removeMoney(player, price.multiply(amount).doubleValue());
                     player.getInventory().addItem(machine.getItem(amount, 100));
 
                     for (String purchasedMsg : Messages.SUCCESSFUL_PURCHASED) {
@@ -91,7 +92,7 @@ public class PlayerChatListener implements Listener {
                     return;
                 }
 
-                VaultHook.removeMoney(player, price.multiply(amount).doubleValue());
+                VaultHook.get().removeMoney(player, price.multiply(amount).doubleValue());
                 player.getInventory().addItem(machine.getItem(amount, 100));
 
                 for (String purchasedMsg : Messages.SUCCESSFUL_PURCHASED) {
@@ -126,7 +127,7 @@ public class PlayerChatListener implements Listener {
 
                 playerMachine.getManagers().add(new Manager(target.getUniqueId(), new ArrayList<>(5)));
                 playerMachine.setQueueUpdate(true);
-                Menus.getInstance().openManagersMenu(player, playerMachine);
+                VoltzMachines.get().getServer().getScheduler().runTaskLater(VoltzMachines.get(), () -> Menus.getInstance().openManagersMenu(player, playerMachine), 0L);
             }
             case REMOVE_STACK -> {
                 BigInteger stack = playerMachine.getStack();

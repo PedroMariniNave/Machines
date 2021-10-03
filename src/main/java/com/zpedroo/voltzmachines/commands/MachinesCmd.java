@@ -1,6 +1,7 @@
 package com.zpedroo.voltzmachines.commands;
 
-import com.zpedroo.voltzmachines.machine.Machine;
+import com.zpedroo.voltzmachines.managers.DataManager;
+import com.zpedroo.voltzmachines.objects.Machine;
 import com.zpedroo.voltzmachines.managers.MachineManager;
 import com.zpedroo.voltzmachines.utils.config.Messages;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
@@ -23,12 +24,11 @@ public class MachinesCmd implements CommandExecutor {
         Player player = sender instanceof Player ? (Player) sender : null;
 
         if (args.length > 0) {
-            String arg = args[0].toUpperCase();
             Player target = null;
             BigInteger amount = null;
             ItemStack item = null;
 
-            switch (arg) {
+            switch (args[0].toUpperCase()) {
                 case "TOP":
                     if (player == null) return true;
 
@@ -42,7 +42,7 @@ public class MachinesCmd implements CommandExecutor {
                         return true;
                     }
 
-                    Machine machine = MachineManager.getInstance().getMachine(args[2]);
+                    Machine machine = DataManager.getInstance().getMachine(args[2]);
 
                     if (machine == null) {
                         sender.sendMessage(Messages.INVALID_MACHINE);

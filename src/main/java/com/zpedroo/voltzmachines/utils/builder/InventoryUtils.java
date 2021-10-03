@@ -19,7 +19,7 @@ public class InventoryUtils {
     private static InventoryUtils instance;
     public static InventoryUtils getInstance() { return instance; }
 
-    private Table<Inventory, Object, List<Action>> inventoryActions;
+    private Table<Inventory, ItemStack, List<Action>> inventoryActions;
 
     public InventoryUtils() {
         instance = this;
@@ -27,17 +27,17 @@ public class InventoryUtils {
         VoltzMachines.get().getServer().getPluginManager().registerEvents(new ActionListeners(), VoltzMachines.get()); // register inventory listener
     }
 
-    public void addAction(Inventory inventory, Object object, Runnable action, ActionType type) {
-        List<Action> actions = hasAction(inventory, object) ? getActions(inventory, object) : new ArrayList<>(2);
-        actions.add(new Action(type, object, action));
+    public void addAction(Inventory inventory, ItemStack item, Runnable action, ActionType type) {
+        List<Action> actions = hasAction(inventory, item) ? getActions(inventory, item) : new ArrayList<>(1);
+        actions.add(new Action(type, item, action));
 
-        inventoryActions.put(inventory, object, actions);
+        inventoryActions.put(inventory, item, actions);
     }
 
-    public Action getAction(Inventory inventory, Object object, ActionType actionType) {
-        if (!hasAction(inventory, object)) return null;
+    public Action getAction(Inventory inventory, ItemStack item, ActionType actionType) {
+        if (!hasAction(inventory, item)) return null;
 
-        for (Action action : getActions(inventory, object)) {
+        for (Action action : getActions(inventory, item)) {
             if (action.getType() != actionType) continue;
 
             return action;
@@ -50,8 +50,8 @@ public class InventoryUtils {
         return inventoryActions.containsRow(inventory);
     }
 
-    public Boolean hasAction(Inventory inventory, Object object) {
-        return inventoryActions.row(inventory).containsKey(object);
+    public Boolean hasAction(Inventory inventory, ItemStack item) {
+        return inventoryActions.row(inventory).containsKey(item);
     }
 
     public List<Action> getInventoryActions(Inventory inventory) {
@@ -66,19 +66,19 @@ public class InventoryUtils {
         return ret;
     }
 
-    public List<Action> getActions(Inventory inventory, Object object) {
-        return inventoryActions.row(inventory).get(object);
+    public List<Action> getActions(Inventory inventory, ItemStack item) {
+        return inventoryActions.row(inventory).get(item);
     }
 
     public static class Action {
 
         private ActionType type;
-        private Object object;
+        private ItemStack item;
         private Runnable action;
 
-        public Action(ActionType type, Object object, Runnable action) {
+        public Action(ActionType type, ItemStack item, Runnable action) {
             this.type = type;
-            this.object = object;
+            this.item = item;
             this.action = action;
         }
 
@@ -90,8 +90,8 @@ public class InventoryUtils {
             return action;
         }
 
-        public Object getObject() {
-            return object;
+        public ItemStack getItem() {
+            return item;
         }
 
         public void run() {
@@ -113,31 +113,14 @@ public class InventoryUtils {
 
             Inventory inventory = event.getInventory();
             ItemStack item = event.getCurrentItem().clone();
-            int slot = event.getSlot();
 
-            Action action = null;
+            Action action = getAction(inventory, item, ActionType.ALL_CLICKS);
 
-            try {
-                action = getAction(inventory, item, ActionType.ALL_CLICKS);
-
-                if (action == null) {
-                    // try to found specific actions for items
-                    switch (event.getClick()) {
-                        case LEFT, SHIFT_LEFT -> action = getAction(inventory, item, ActionType.LEFT_CLICK);
-                        case RIGHT, SHIFT_RIGHT -> action = getAction(event.getInventory(), item, ActionType.RIGHT_CLICK);
-                    }
-                }
-            } finally {
-                if (action != null) return;
-
-                action = getAction(inventory, slot, ActionType.ALL_CLICKS);
-
-                if (action == null) {
-                    // try to found specific actions for items
-                    switch (event.getClick()) {
-                        case LEFT, SHIFT_LEFT -> action = getAction(inventory, slot, ActionType.LEFT_CLICK);
-                        case RIGHT, SHIFT_RIGHT -> action = getAction(event.getInventory(), slot, ActionType.RIGHT_CLICK);
-                    }
+            if (action == null) {
+                // try to found specific actions for items
+                switch (event.getClick()) {
+                    case LEFT, SHIFT_LEFT -> action = getAction(inventory, item, ActionType.LEFT_CLICK);
+                    case RIGHT, SHIFT_RIGHT -> action = getAction(inventory, item, ActionType.RIGHT_CLICK);
                 }
             }
 

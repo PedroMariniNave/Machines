@@ -1,6 +1,6 @@
 package com.zpedroo.voltzmachines.utils.item;
 
-import com.zpedroo.voltzmachines.FileUtils;
+import com.zpedroo.voltzmachines.utils.FileUtils;
 import com.zpedroo.voltzmachines.utils.builder.ItemBuilder;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
 import de.tr7zw.nbtapi.NBTItem;
@@ -106,7 +106,7 @@ public class Items {
             if (displayName != null) meta.setDisplayName(StringUtils.replaceEach(displayName, new String[] {
                     "{percentage}"
             }, new String[] {
-                    NumberFormatter.getInstance().formatDecimal(Double.valueOf(percentage))
+                    NumberFormatter.getInstance().formatDecimal(percentage.doubleValue())
             }));
 
             if (lore != null) {
@@ -116,7 +116,7 @@ public class Items {
                     newLore.add(StringUtils.replaceEach(str, new String[] {
                             "{percentage}"
                     }, new String[] {
-                            NumberFormatter.getInstance().formatDecimal(Double.valueOf(percentage))
+                            NumberFormatter.getInstance().formatDecimal(percentage.doubleValue())
                     }));
                 }
 

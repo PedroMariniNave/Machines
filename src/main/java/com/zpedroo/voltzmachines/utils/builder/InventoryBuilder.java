@@ -19,7 +19,7 @@ public class InventoryBuilder {
     private ItemStack nextPageItem;
     private ItemStack previousPageItem;
     private Inventory defaultInventory;
-    private HashMap<Integer, Inventory> inventories;
+    private Map<Integer, Inventory> inventories;
 
     public InventoryBuilder(Player player, Inventory defaultInventory, String title, List<ItemBuilder> builders, Integer nextPageSlot, Integer previousPageSlot, ItemStack nextPageItem, ItemStack previousPageItem) {
         this.player = player;
@@ -75,7 +75,7 @@ public class InventoryBuilder {
         return nextPageItem;
     }
 
-    private HashMap<Integer, Inventory> getInventories() {
+    private Map<Integer, Inventory> getInventories() {
         return inventories;
     }
 
@@ -94,12 +94,12 @@ public class InventoryBuilder {
             inventory.setItem(slot, item);
         }
 
-        if (InventoryUtils.getInstance().hasAction(getDefaultInventory())) {
+        if (InventoryUtils.getInstance().hasAction(defaultInventory)) {
             // clone all actions
             for (InventoryUtils.Action action : InventoryUtils.getInstance().getInventoryActions(defaultInventory)) {
                 if (action == null) continue;
 
-                InventoryUtils.getInstance().addAction(inventory, action.getObject(), action.getAction(), action.getType());
+                InventoryUtils.getInstance().addAction(inventory, action.getItem(), action.getAction(), action.getType());
             }
         }
 
@@ -117,7 +117,7 @@ public class InventoryBuilder {
                 Validate.notNull(nextPageItem, "Next page item cannot be null!");
                 Validate.notNull(nextPageSlot, "Next page slot cannot be null!");
 
-                InventoryUtils.getInstance().addAction(inventory, nextPageSlot, () -> {
+                InventoryUtils.getInstance().addAction(inventory, nextPageItem, () -> {
                     open(page+1);
                 }, InventoryUtils.ActionType.ALL_CLICKS);
 
@@ -135,8 +135,10 @@ public class InventoryBuilder {
 
             if (actions != null && actions.size() != 0) {
                 for (InventoryUtils.Action action : actions) {
-                    InventoryUtils.getInstance().addAction(inventory, slot, action.getAction(), action.getType());
+                    InventoryUtils.getInstance().addAction(inventory, item, action.getAction(), action.getType());
                 }
+            } else {
+                InventoryUtils.getInstance().addAction(inventory, item, null, InventoryUtils.ActionType.ALL_CLICKS);
             }
 
             inventory.setItem(slot, item);
@@ -147,7 +149,7 @@ public class InventoryBuilder {
             Validate.notNull(getPreviousPageItem(), "Previous page item cannot be null!");
             Validate.notNull(getPreviousPageSlot(), "Previous page slot cannot be null!");
 
-            InventoryUtils.getInstance().addAction(inventory, previousPageSlot, () -> {
+            InventoryUtils.getInstance().addAction(inventory, previousPageItem, () -> {
                 open(page-1);
             }, InventoryUtils.ActionType.ALL_CLICKS);
 

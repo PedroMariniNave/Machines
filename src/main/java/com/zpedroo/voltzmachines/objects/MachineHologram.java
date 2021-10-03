@@ -1,4 +1,4 @@
-package com.zpedroo.voltzmachines.machine;
+package com.zpedroo.voltzmachines.objects;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
@@ -6,8 +6,10 @@ import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.zpedroo.voltzmachines.VoltzMachines;
 import com.zpedroo.voltzmachines.utils.config.Settings;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 public class MachineHologram {
@@ -38,10 +40,14 @@ public class MachineHologram {
 
             hologram.getVisibilityManager().setVisibleByDefault(false);
 
+            for (Entity nearEntity : machine.getLocation().getWorld().getNearbyEntities(machine.getLocation().clone().add(0.5D, 0D, 0.5D), 1D, 1D, 1D)) {
+                if (nearEntity.hasMetadata("Machine Item")) nearEntity.remove();
+            }
+
             displayItem = machine.getLocation().getWorld().dropItem(machine.getLocation().clone().add(0.5D, 1D, 0.5D), machine.getMachine().getDisplayItem());
             displayItem.setVelocity(new Vector(0, 0.1, 0));
             displayItem.setPickupDelay(Integer.MAX_VALUE);
-            displayItem.setCustomName("Machine Item");
+            displayItem.setMetadata("Machine Item", new FixedMetadataValue(VoltzMachines.get(), true));
             displayItem.setCustomNameVisible(false);
         } else {
             for (int i = 0; i < hologramLines.length; i++) {

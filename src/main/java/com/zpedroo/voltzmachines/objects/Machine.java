@@ -1,4 +1,4 @@
-package com.zpedroo.voltzmachines.machine;
+package com.zpedroo.voltzmachines.objects;
 
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
 import de.tr7zw.nbtapi.NBTItem;

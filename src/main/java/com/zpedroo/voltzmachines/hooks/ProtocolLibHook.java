@@ -1,73 +1,51 @@
 package com.zpedroo.voltzmachines.hooks;
 
 import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import com.zpedroo.voltzmachines.VoltzMachines;
-import com.zpedroo.voltzmachines.machine.MachineHologram;
-import com.zpedroo.voltzmachines.managers.MachineManager;
-import com.zpedroo.voltzmachines.machine.PlayerMachine;
+import com.zpedroo.voltzmachines.managers.DataManager;
+import com.zpedroo.voltzmachines.objects.MachineHologram;
+import com.zpedroo.voltzmachines.objects.PlayerMachine;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-public class ProtocolLibHook {
+public class ProtocolLibHook extends PacketAdapter {
 
-    private static ProtocolLibHook instance;
-    public static ProtocolLibHook getInstance() { return instance; }
-
-    private ProtocolManager protocolManager;
-
-    private HashMap<Player, List<MachineHologram>> holograms;
-
-    public ProtocolLibHook() {
-        instance = this;
-        this.protocolManager = ProtocolLibrary.getProtocolManager();
-        this.holograms = new HashMap<>(512);
-        this.registerPackets();
+    public ProtocolLibHook(Plugin plugin, PacketType packetType) {
+        super(plugin, packetType);
     }
 
-    private void registerPackets() {
-        getProtocolManager().addPacketListener(new PacketAdapter(VoltzMachines.get(), ListenerPriority.LOWEST, PacketType.Play.Client.LOOK) {
-            public void onPacketReceiving(PacketEvent event) {
-                Player player = event.getPlayer();
-                Block block = player.getTargetBlock(null, 15);
+    private Map<Player, List<MachineHologram>> hologramsToHide = new HashMap<>(128);
 
-                Location location = block.getLocation();
+    public void onPacketReceiving(PacketEvent event) {
+        Player player = event.getPlayer();
+        Block block = player.getTargetBlock(null, 15);
 
-                PlayerMachine machine = MachineManager.getInstance().getMachine(location);
+        Location location = block.getLocation();
+        PlayerMachine machine = DataManager.getInstance().getMachine(location);
 
-                if (machine == null) {
-                    if (!holograms.containsKey(player)) return;
+        if (machine == null) {
+            if (!hologramsToHide.containsKey(player)) return;
 
-                    List<MachineHologram> holoList = holograms.remove(player);
+            List<MachineHologram> holoList = hologramsToHide.remove(player);
 
-                    for (MachineHologram hologram : holoList) {
-                        hologram.hideTo(player);
-                    }
-                    return;
-                }
-
-                MachineHologram hologram = machine.getHologram();
-
-                hologram.showTo(player);
-
-                List<MachineHologram> holoList = holograms.containsKey(player) ? holograms.get(player) : new ArrayList<>();
-                holoList.add(hologram);
-
-                holograms.put(player, holoList);
+            for (MachineHologram hologram : holoList) {
+                hologram.hideTo(player);
             }
-        });
-    }
+            return;
+        }
 
-    public ProtocolManager getProtocolManager() {
-        return protocolManager;
+        MachineHologram hologram = machine.getHologram();
+
+        hologram.showTo(player);
+
+        List<MachineHologram> holoList = hologramsToHide.containsKey(player) ? hologramsToHide.get(player) : new ArrayList<>(2);
+        holoList.add(hologram);
+
+        hologramsToHide.put(player, holoList);
     }
 }

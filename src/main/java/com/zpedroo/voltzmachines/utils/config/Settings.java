@@ -1,6 +1,6 @@
 package com.zpedroo.voltzmachines.utils.config;
 
-import com.zpedroo.voltzmachines.FileUtils;
+import com.zpedroo.voltzmachines.utils.FileUtils;
 import org.bukkit.ChatColor;
 
 import java.math.BigInteger;

@@ -1,8 +1,7 @@
 package com.zpedroo.voltzmachines.tasks;
 
 import com.zpedroo.voltzmachines.VoltzMachines;
-import com.zpedroo.voltzmachines.managers.MachineManager;
-import com.zpedroo.voltzmachines.utils.config.Settings;
+import com.zpedroo.voltzmachines.managers.DataManager;
 import org.bukkit.Sound;
 import org.bukkit.scheduler.BukkitRunnable;
 import xyz.xenondevs.particle.ParticleEffect;
@@ -11,18 +10,20 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Random;
 
+import static com.zpedroo.voltzmachines.utils.config.Settings.*;
+
 public class MachineTask extends BukkitRunnable {
 
     public MachineTask(VoltzMachines voltzMachines) {
-        this.runTaskTimerAsynchronously(voltzMachines, 20 * 30L, Settings.MACHINE_UPDATE);
+        this.runTaskTimerAsynchronously(voltzMachines, 20 * 30L, MACHINE_UPDATE);
     }
 
     @Override
     public void run() {
-        new HashSet<>(MachineManager.getInstance().getDataCache().getPlayerMachines().values()).forEach(machine -> {
+        new HashSet<>(DataManager.getInstance().getCache().getPlayerMachines().values()).forEach(machine -> {
             if (machine == null || !machine.isEnabled()) return;
 
-            int delay = machine.getDelay() - Settings.MACHINE_UPDATE;
+            int delay = machine.getDelay() - MACHINE_UPDATE;
             machine.setDelay(delay);
 
             if (delay >= 0) return;
@@ -61,11 +62,10 @@ public class MachineTask extends BukkitRunnable {
 
             if (drops.signum() <= 0) drops = BigInteger.ONE;
 
-            BigInteger fuel = drops.divide(BigInteger.TEN); // 10 stacks = 1L
-
             machine.addDrops(drops);
 
             if (!machine.hasInfiniteFuel()) {
+                BigInteger fuel = drops.divide(BigInteger.TEN); // 10 stacks = 1L
                 machine.removeFuel(fuel.signum() <= 0 ? BigInteger.ONE : fuel);
 
                 if (machine.getFuel().signum() <= 0) {

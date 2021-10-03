@@ -1,7 +1,5 @@
 package com.zpedroo.voltzmachines.objects;
 
-import com.zpedroo.voltzmachines.machine.Machine;
-import com.zpedroo.voltzmachines.machine.PlayerMachine;
 import com.zpedroo.voltzmachines.utils.enums.Action;
 import org.bukkit.entity.Player;
 

@@ -1,8 +1,7 @@
-package com.zpedroo.voltzmachines.machine;
+package com.zpedroo.voltzmachines.objects;
 
 import com.zpedroo.voltzmachines.VoltzMachines;
-import com.zpedroo.voltzmachines.managers.MachineManager;
-import com.zpedroo.voltzmachines.objects.Manager;
+import com.zpedroo.voltzmachines.managers.DataManager;
 import com.zpedroo.voltzmachines.utils.config.Messages;
 import com.zpedroo.voltzmachines.utils.config.Titles;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
@@ -109,7 +108,7 @@ public class PlayerMachine {
     }
 
     public Boolean hasReachStackLimit() {
-        if (machine.getMaxStack().signum() < 0) return false;
+        if (machine.getMaxStack().signum() <= 0) return false;
 
         return stack.compareTo(machine.getMaxStack()) >= 0;
     }
@@ -131,9 +130,9 @@ public class PlayerMachine {
     }
 
     public void delete() {
-        MachineManager.getInstance().getDataCache().getDeletedMachines().add(location);
-        MachineManager.getInstance().getDataCache().getPlayerMachines().remove(location);
-        MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(ownerUUID).remove(this);
+        DataManager.getInstance().getCache().getDeletedMachines().add(location);
+        DataManager.getInstance().getCache().getPlayerMachines().remove(location);
+        DataManager.getInstance().getCache().getPlayerMachinesByUUID(ownerUUID).remove(this);
 
         this.hologram.remove();
         this.location.getBlock().setType(Material.AIR);
@@ -282,11 +281,11 @@ public class PlayerMachine {
     }
 
     public void cache() {
-        MachineManager.getInstance().getDataCache().getPlayerMachines().put(location, this);
+        DataManager.getInstance().getCache().getPlayerMachines().put(location, this);
 
-        List<PlayerMachine> machines = MachineManager.getInstance().getDataCache().getPlayerMachinesByUUID(getOwnerUUID());
+        List<PlayerMachine> machines = DataManager.getInstance().getCache().getPlayerMachinesByUUID(ownerUUID);
         machines.add(this);
 
-        MachineManager.getInstance().getDataCache().setUUIDMachines(ownerUUID, machines);
+        DataManager.getInstance().getCache().setUUIDMachines(ownerUUID, machines);
     }
 }

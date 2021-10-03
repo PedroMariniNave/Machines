@@ -1,12 +1,20 @@
 package com.zpedroo.voltzmachines.utils.config;
 
-import com.zpedroo.voltzmachines.FileUtils;
+import com.zpedroo.voltzmachines.utils.FileUtils;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Messages {
+
+    public static final String ZERO_MACHINES_FUEL = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.zero-machines-fuel"));
+
+    public static final String ZERO_MACHINES_REPAIR = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.zero-machines-repair"));
+
+    public static final String SUCCESSFUL_FUELED = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.successful-fueled"));
+
+    public static final String SUCCESSFUL_REPAIRED = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.successful-repaired"));
 
     public static final String NEED_PERMISSION = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.need-permission"));
 
@@ -46,23 +54,23 @@ public class Messages {
 
     public static final String WAIT = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.wait"));
 
-    public static final String SECOND = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.second"));
+    public static final String SECOND = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.second"));
 
-    public static final String SECONDS = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.seconds"));
+    public static final String SECONDS = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.seconds"));
 
-    public static final String MINUTE = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.minute"));
+    public static final String MINUTE = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.minute"));
 
-    public static final String MINUTES = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.minutes"));
+    public static final String MINUTES = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.minutes"));
 
-    public static final String HOUR = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.hour"));
+    public static final String HOUR = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.hour"));
 
-    public static final String HOURS = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.hours"));
+    public static final String HOURS = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.hours"));
 
-    public static final String DAY = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.day"));
+    public static final String DAY = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.day"));
 
-    public static final String DAYS = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.days"));
+    public static final String DAYS = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.days"));
 
-    public static final String NOW = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "TimeFormatter.now"));
+    public static final String NOW = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Time-Formatter.now"));
 
     public static final List<String> NEW_QUOTATION = getColored(FileUtils.get().getStringList(FileUtils.Files.CONFIG, "Messages.new-quotation"));
 
@@ -79,7 +87,7 @@ public class Messages {
     }
 
     private static List<String> getColored(List<String> list) {
-        List<String> colored = new ArrayList<>();
+        List<String> colored = new ArrayList<>(list.size());
         for (String str : list) {
             colored.add(getColored(str));
         }

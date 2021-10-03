@@ -29,9 +29,9 @@ public class Manager {
 
     public void set(Permission permission, Boolean status) {
         if (status) {
-            getPermissions().add(permission);
+            permissions.add(permission);
         } else {
-            getPermissions().remove(permission);
+            permissions.remove(permission);
         }
     }
 }

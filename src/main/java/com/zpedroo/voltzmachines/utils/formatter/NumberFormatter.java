@@ -19,7 +19,7 @@ public class NumberFormatter {
 
     public NumberFormatter(FileConfiguration file) {
         instance = this;
-        NAMES.addAll(file.getStringList("NumberFormatter"));
+        NAMES.addAll(file.getStringList("Number-Formatter"));
 
         for (int i = 0; i < NAMES.size(); i++) {
             FORMATS.put(THOUSAND.pow(i+1), NAMES.get(i));
