@@ -4,8 +4,6 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.zpedroo.voltzmachines.commands.MachinesCmd;
 import com.zpedroo.voltzmachines.hooks.ProtocolLibHook;
-import com.zpedroo.voltzmachines.hooks.VaultHook;
-import com.zpedroo.voltzmachines.hooks.WorldGuardHook;
 import com.zpedroo.voltzmachines.listeners.MachineListeners;
 import com.zpedroo.voltzmachines.listeners.PlayerChatListener;
 import com.zpedroo.voltzmachines.listeners.PlayerGeneralListeners;
@@ -20,7 +18,6 @@ import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
 import com.zpedroo.voltzmachines.utils.formatter.TimeFormatter;
 import com.zpedroo.voltzmachines.utils.item.Items;
 import com.zpedroo.voltzmachines.utils.menu.Menus;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -41,16 +38,13 @@ public class VoltzMachines extends JavaPlugin {
             return;
         }
 
+        new NumberFormatter(getConfig());
         new DBConnection(getConfig());
-        new MachineManager();
-        new VaultHook();
-        new WorldGuardHook();
         new MachineTask(this);
         new SaveTask(this);
         new QuotationTask(this);
         new Menus();
         new Items();
-        new NumberFormatter(getConfig());
         new TimeFormatter();
 
         ProtocolLibrary.getProtocolManager().addPacketListener(new ProtocolLibHook(this, PacketType.Play.Client.LOOK));
@@ -63,8 +57,8 @@ public class VoltzMachines extends JavaPlugin {
         if (!isMySQLEnabled(getConfig())) return;
 
         try {
+            MachineManager.clearAll();
             DataManager.getInstance().saveAll();
-            MachineManager.getInstance().clearAll();
             DBConnection.getInstance().closeConnection();
         } catch (Exception ex) {
             getLogger().log(Level.SEVERE, "An error occurred while trying to save data!");
@@ -82,7 +76,7 @@ public class VoltzMachines extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerGeneralListeners(), this);
     }
 
-    private Boolean isMySQLEnabled(FileConfiguration file) {
+    private boolean isMySQLEnabled(FileConfiguration file) {
         if (!file.contains("MySQL.enabled")) return false;
 
         return file.getBoolean("MySQL.enabled");

@@ -15,27 +15,33 @@ public class Machine {
 
     private ItemStack item;
     private Material block;
+    private byte blockData;
     private String type;
     private String typeTranslated;
     private String displayName;
-    private Integer delay;
-    private BigInteger amount;
+    private int dropsDelay;
+    private BigInteger dropsAmount;
     private BigInteger dropsValue;
     private BigInteger dropsPreviousValue;
+    private BigInteger dropsMinimumValue;
+    private BigInteger dropsMaximumValue;
     private BigInteger maxStack;
     private String permission;
     private List<String> commands;
 
-    public Machine(ItemStack item, Material block, String type, String typeTranslated, String displayName, Integer delay, BigInteger amount, BigInteger dropsValue, BigInteger dropsPreviousValue, BigInteger maxStack, String permission, List<String> commands) {
+    public Machine(ItemStack item, Material block, byte blockData, String type, String typeTranslated, String displayName, int dropsDelay, BigInteger dropsAmount, BigInteger dropsValue, BigInteger dropsPreviousValue, BigInteger dropsMinimumValue, BigInteger dropsMaximumValue, BigInteger maxStack, String permission, List<String> commands) {
         this.item = item;
         this.block = block;
+        this.blockData = blockData;
         this.type = type;
         this.typeTranslated = typeTranslated;
         this.displayName = displayName;
-        this.delay = delay;
-        this.amount = amount;
+        this.dropsDelay = dropsDelay;
+        this.dropsAmount = dropsAmount;
         this.dropsValue = dropsValue;
         this.dropsPreviousValue = dropsPreviousValue;
+        this.dropsMinimumValue = dropsMinimumValue;
+        this.dropsMaximumValue = dropsMaximumValue;
         this.maxStack = maxStack;
         this.permission = permission;
         this.commands = commands;
@@ -45,15 +51,19 @@ public class Machine {
         return block;
     }
 
+    public byte getBlockData() {
+        return blockData;
+    }
+
     public ItemStack getDisplayItem() {
         return item.clone();
     }
 
-    public ItemStack getItem(BigInteger amount, Integer integrity) {
+    public ItemStack getItem(BigInteger amount, BigInteger integrity) {
         NBTItem nbt = new NBTItem(item.clone());
         nbt.setString("MachinesAmount", amount.toString());
+        nbt.setString("MachinesIntegrity", integrity.toString());
         nbt.setString("MachinesType", getType());
-        nbt.setInteger("MachinesIntegrity", integrity);
 
         ItemStack item = nbt.getItem();
         if (item.getItemMeta() != null) {
@@ -103,12 +113,12 @@ public class Machine {
         return displayName;
     }
 
-    public Integer getDelay() {
-        return delay;
+    public int getDropsDelay() {
+        return dropsDelay;
     }
 
-    public BigInteger getAmount() {
-        return amount;
+    public BigInteger getDropsAmount() {
+        return dropsAmount;
     }
 
     public BigInteger getDropsValue() {
@@ -117,6 +127,14 @@ public class Machine {
 
     public BigInteger getDropsPreviousValue() {
         return dropsPreviousValue;
+    }
+
+    public BigInteger getDropsMinimumValue() {
+        return dropsMinimumValue;
+    }
+
+    public BigInteger getDropsMaximumValue() {
+        return dropsMaximumValue;
     }
 
     public BigInteger getMaxStack() {

@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Messages {
 
+    public static final String ONLY_ONE_MACHINE = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.only-one-machine"));
+
     public static final String ZERO_MACHINES_FUEL = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.zero-machines-fuel"));
 
     public static final String ZERO_MACHINES_REPAIR = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.zero-machines-repair"));
@@ -24,6 +26,8 @@ public class Messages {
 
     public static final String INCORRECT_PICKAXE = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.incorrect-pickaxe"));
 
+    public static final String INCORRECT_GIFT_OWNER = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.incorrect-gift-owner"));
+
     public static final String ONLY_OWNER = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.only-owner"));
 
     public static final String OFFLINE_PLAYER = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.offline-player"));
@@ -38,11 +42,11 @@ public class Messages {
 
     public static final String MACHINE_PERMISSION = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.machine-permission"));
 
-    public static final String BUY_ALL_ZERO = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.buy-all-zero"));
-
-    public static final String INSUFFICIENT_MONEY = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.insufficient-money"));
+    public static final String INSUFFICIENT_CURRENCY = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.insufficient-currency"));
 
     public static final String NEAR_MACHINE = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.near-machine"));
+
+    public static final String BONUS = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.bonus"));
 
     public static final String ENABLED = getColored(FileUtils.get().getString(FileUtils.Files.CONFIG, "Messages.enabled"));
 

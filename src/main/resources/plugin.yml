@@ -1,10 +1,10 @@
 name: ${project.artifactId}
 description: ${project.description}
 version: ${project.version}
-api-version: 1.16
+api-version: 1.8
 author: zPedroo_
 main: com.zpedroo.voltzmachines.VoltzMachines
-depend: [WorldGuard, HolographicDisplays, Vault, ProtocolLib]
+depend: [HolographicDisplays, MultiEconomy, ProtocolLib, PlotSquared]
 load: POSTWORLD
 commands:
   machines:

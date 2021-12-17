@@ -20,7 +20,7 @@ Back:
   slot: 48
 
 Add-Friend:
-  type: PLAYER_HEAD
+  type: SKULL_ITEM
   owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
   name: '&aAdicionar Amigo'
   lore:
@@ -29,7 +29,7 @@ Add-Friend:
   slot: 50
 
 Item:
-  type: PLAYER_HEAD
+  type: SKULL_ITEM
   owner: "{player}"
   name: "&a{player}"
   lore:

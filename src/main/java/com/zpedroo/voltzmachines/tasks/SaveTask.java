@@ -4,7 +4,7 @@ import com.zpedroo.voltzmachines.VoltzMachines;
 import com.zpedroo.voltzmachines.managers.DataManager;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import static com.zpedroo.voltzmachines.utils.config.Settings.*;
+import static com.zpedroo.voltzmachines.utils.config.Settings.SAVE_INTERVAL;
 
 public class SaveTask extends BukkitRunnable {
 

@@ -5,6 +5,7 @@ import com.zpedroo.voltzmachines.utils.builder.ItemBuilder;
 import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
 import de.tr7zw.nbtapi.NBTItem;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -92,9 +93,9 @@ public class Items {
         return nbt.getItem();
     }
 
-    public ItemStack getRepair(Integer percentage) {
+    public ItemStack getRepair(BigInteger percentage) {
         NBTItem nbt = new NBTItem(repair.clone());
-        nbt.setInteger("MachinesRepair", percentage);
+        nbt.setString("MachinesRepair", percentage.toString());
 
         ItemStack item = nbt.getItem();
 
@@ -106,7 +107,7 @@ public class Items {
             if (displayName != null) meta.setDisplayName(StringUtils.replaceEach(displayName, new String[] {
                     "{percentage}"
             }, new String[] {
-                    NumberFormatter.getInstance().formatDecimal(percentage.doubleValue())
+                    NumberFormatter.getInstance().format(percentage)
             }));
 
             if (lore != null) {
@@ -116,7 +117,7 @@ public class Items {
                     newLore.add(StringUtils.replaceEach(str, new String[] {
                             "{percentage}"
                     }, new String[] {
-                            NumberFormatter.getInstance().formatDecimal(percentage.doubleValue())
+                            NumberFormatter.getInstance().format(percentage)
                     }));
                 }
 
@@ -129,9 +130,10 @@ public class Items {
         return item;
     }
 
-    public ItemStack getGift() {
+    public ItemStack getGift(Player player) {
         NBTItem nbt = new NBTItem(gift.clone());
         nbt.addCompound("MachinesGift");
+        nbt.setString("GiftOwner", player.getUniqueId().toString());
 
         return nbt.getItem();
     }

@@ -1,0 +1,59 @@
+Inventory:
+  title: "Máquinas"
+  size: 27
+  items:
+    1:
+      currency: coins
+      weight: 100
+      type: SKULL_ITEM
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQxYzY4NmJhZDY0ZTg5OTNmZDBkYzU2YWVjMDBkMmQzYTE4NjNkMDEzMzk0MzE1MTA4MzM5MmUzZmYwNGNmMSJ9fX0=
+      name: '&eCoins'
+      lore:
+        - '&7Preço: {price}'
+        - ''
+        - '&7Clique para selecionar essa moeda!'
+      slot: 11
+    2:
+      currency: gems
+      weight: 10
+      type: SKULL_ITEM
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWJkZDRjMmE0NjA3MDQzZWQ2YTg4NGVhMTU1NmIxNDkzYTA3NGE4ZTZlNmFjNjEwZDIyYjkzZTU4OGUxZjc4OSJ9fX0=
+      name: '&5Gemas'
+      lore:
+        - '&7Preço: {price}'
+        - ''
+        - '&7Clique para selecionar essa moeda!'
+      slot: 12
+    3:
+      currency: tokens
+      weight: 10
+      type: SKULL_ITEM
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDc3NGU1ZWYzZDhiY2RlOWVhMjFjMzRiODQ4MjdkMzQ1MzFlNjhmMTExNTEwZjMzODMwNTVlY2FhNzRiZWJjYyJ9fX0=
+      name: '&6Tokens'
+      lore:
+        - '&7Preço: {price}'
+        - ''
+        - '&7Clique para selecionar essa moeda!'
+      slot: 13
+    4:
+      currency: cash
+      weight: 0.01
+      type: SKULL_ITEM
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjgwOWQyZTY5NjEwZjFlNmI3NWZlMGQ0NTk4ZTQ0MWU1NjAzMjVkMmQ1MmQ5N2NmNjY4NTljNDRmYTNkOGE3OSJ9fX0=
+      name: '&6Cash'
+      lore:
+        - '&7Preço: {price}'
+        - ''
+        - '&7Clique para selecionar essa moeda!'
+      slot: 14
+    5:
+      currency: vipcoin
+      weight: 1
+      type: SKULL_ITEM
+      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmYyM2Q5MTAxYTI1ZTQ1N2M5MmJhOTE3MTUyMmMxOWNiZjczNDVmNzA3MjZiZGVhNWFhNGI5M2MyYTBiMzM2NyJ9fX0=
+      name: '&6Moeda VIP'
+      lore:
+        - '&7Preço: {price}'
+        - ''
+        - '&7Clique para selecionar essa moeda!'
+      slot: 15

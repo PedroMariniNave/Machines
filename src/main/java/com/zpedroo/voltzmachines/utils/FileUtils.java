@@ -42,39 +42,39 @@ public class FileUtils {
         return getFiles().get(file).get().getStringList(path);
     }
 
-    public Boolean getBoolean(Files file, String path) {
+    public boolean getBoolean(Files file, String path) {
         return getFile(file).get().getBoolean(path);
     }
 
-    public Integer getInt(Files file, String path) {
+    public int getInt(Files file, String path) {
         return getInt(file, path, 0);
     }
 
-    public Integer getInt(Files file, String path, int defaultValue) {
+    public int getInt(Files file, String path, int defaultValue) {
         return getFile(file).get().getInt(path, defaultValue);
     }
 
-    public Long getLong(Files file, String path) {
+    public long getLong(Files file, String path) {
         return getLong(file, path, 0);
     }
 
-    public Long getLong(Files file, String path, long defaultValue) {
+    public long getLong(Files file, String path, long defaultValue) {
         return getFile(file).get().getLong(path, defaultValue);
     }
 
-    public Double getDouble(Files file, String path) {
+    public double getDouble(Files file, String path) {
         return getDouble(file, path, 0);
     }
 
-    public Double getDouble(Files file, String path, double defaultValue) {
+    public double getDouble(Files file, String path, double defaultValue) {
         return getFile(file).get().getDouble(path, defaultValue);
     }
 
-    public Float getFloat(Files file, String path) {
+    public float getFloat(Files file, String path) {
         return getFloat(file, path, 0);
     }
 
-    public Float getFloat(Files file, String path, float defaultValue) {
+    public float getFloat(Files file, String path, float defaultValue) {
         return (float) getFile(file).get().getDouble(path, defaultValue);
     }
 
@@ -115,6 +115,7 @@ public class FileUtils {
         OTHER_MACHINES("other_machines", "menus", "menus", false),
         TOP_MACHINES("top_machines", "menus", "menus", false),
         SHOP("shop", "menus", "menus", false),
+        CHOOSE_CURRENCY("choose_currency", "menus", "menus", false),
         GIFT("gift", "menus", "menus", false),
         MAIN("main", "menus", "menus", false),
         EMERALD("emerald", "machines", "machines", true);
@@ -122,9 +123,9 @@ public class FileUtils {
         private String name;
         private String resource;
         private String folder;
-        private Boolean requireEmpty;
+        private boolean requireEmpty;
 
-        Files(String name, String resource, String folder, Boolean requireEmpty) {
+        Files(String name, String resource, String folder, boolean requireEmpty) {
             this.name = name;
             this.resource = resource;
             this.folder = folder;
@@ -143,7 +144,7 @@ public class FileUtils {
             return folder;
         }
 
-        public Boolean requireEmpty() {
+        public boolean hasRequiredEmpty() {
             return requireEmpty;
         }
     }
@@ -157,7 +158,7 @@ public class FileUtils {
             this.file = new File(plugin.getDataFolder() + (file.getFolder().isEmpty() ? "" : "/" + file.getFolder()), file.getName() + ".yml");
 
             if (!this.file.exists()) {
-                if (file.requireEmpty()) {
+                if (file.hasRequiredEmpty()) {
                     File folder = new File(plugin.getDataFolder(), file.getFolder());
                     if (folder.listFiles() != null) {
                         if (Stream.of(folder.listFiles()).map(YamlConfiguration::loadConfiguration).count() > 0) return;

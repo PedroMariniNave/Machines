@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -14,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -29,70 +27,46 @@ import java.util.UUID;
 public class ItemBuilder {
 
     private ItemStack item;
-    private Integer slot;
-    private List<InventoryUtils.Action> actions;
 
     private Method metaSetProfileMethod;
     private Field metaProfileField;
 
-    public ItemBuilder(Material material, int amount, short durability, Integer slot, List<InventoryUtils.Action> actions) {
-        if (StringUtils.equals(material.toString(), "PLAYER_HEAD")) {
+    public ItemBuilder(Material material, int amount, short durability) {
+        if (StringUtils.equals(material.toString(), "SKULL_ITEM")) {
             this.item = new ItemStack(material, amount, (short) 3);
         } else {
             this.item = new ItemStack(material, amount, durability);
         }
-
-        this.slot = slot;
-        this.actions = actions;
-    }
-
-    public ItemBuilder(ItemStack item, Integer slot, List<InventoryUtils.Action> actions) {
-        this.item = item;
-        this.slot = slot;
-        this.actions = actions;
-    }
-
-    public static ItemBuilder build(ItemStack item, Integer slot, List<InventoryUtils.Action> actions) {
-        return new ItemBuilder(item, slot, actions);
     }
 
     public static ItemBuilder build(FileConfiguration file, String where) {
-        return build(file, where, null, null, null);
+        return build(file, where, null, null);
     }
 
-    public static ItemBuilder build(FileConfiguration file, String where, String[] placeholders, String[] replacers) {
-        return build(file, where, placeholders, replacers, null);
-    }
-
-    public static ItemBuilder build(FileConfiguration file, String where, List<InventoryUtils.Action> actions) {
-        return build(file, where, null, null, actions);
-    }
-
-    public static ItemBuilder build(FileConfiguration file, String where, String[] placeholders, String[] replacers, List<InventoryUtils.Action> actions) {
-        String type = StringUtils.replaceEach(file.getString(where + ".type"), placeholders, replacers);
+    public static ItemBuilder build(FileConfiguration file, String where, String[] placeholders, String[] replaces) {
+        String type = StringUtils.replaceEach(file.getString(where + ".type"), placeholders, replaces);
         short data = Short.parseShort(file.getString(where + ".data", "0"));
         int amount = file.getInt(where + ".amount", 1);
-        int slot = file.getInt(where + ".slot", 0);
 
         Material material = Material.getMaterial(type);
         Validate.notNull(material, "Material cannot be null! Check your item configs. Invalid material: " + type);
 
-        ItemBuilder builder = new ItemBuilder(material, amount, data, slot, actions);
+        ItemBuilder builder = new ItemBuilder(material, amount, data);
 
         if (file.contains(where + ".name")) {
             String name = ChatColor.translateAlternateColorCodes('&', file.getString(where + ".name"));
-            builder.setName(StringUtils.replaceEach(name, placeholders, replacers));
+            builder.setName(StringUtils.replaceEach(name, placeholders, replaces));
         }
 
         if (file.contains(where + ".lore")) {
-            builder.setLore(file.getStringList(where + ".lore"), placeholders, replacers);
+            builder.setLore(file.getStringList(where + ".lore"), placeholders, replaces);
         }
 
         if (file.contains(where + ".owner")) {
             String owner = file.getString(where + ".owner");
 
-            if (owner.length() <= 16) { // max player name lenght
-                builder.setSkullOwner(StringUtils.replaceEach(owner, placeholders, replacers));
+            if (owner.length() <= 16) {
+                builder.setSkullOwner(StringUtils.replaceEach(owner, placeholders, replaces));
             } else {
                 builder.setCustomTexture(owner);
             }
@@ -127,10 +101,6 @@ public class ItemBuilder {
                     builder.addEnchantment(Enchantment.getByName(enchantment));
                 }
             }
-        }
-
-        if (file.contains(where + ".custom-model-data")) {
-            builder.setCustomModelData(file.getInt(where + ".custom-model-data"));
         }
 
         if (file.contains(where + ".hide-attributes") && file.getBoolean(where + ".hide-attributes")) {
@@ -189,7 +159,7 @@ public class ItemBuilder {
 
         PotionType potionType = PotionType.getByEffect(potionEffectType);
         if (potionType != null) {
-            meta.setBasePotionData(new PotionData(potionType, true, false));
+            meta.addCustomEffect(potionEffect, true);
         }
         item.setItemMeta(meta);
     }
@@ -200,14 +170,6 @@ public class ItemBuilder {
 
         meta.addEnchant(Enchantment.LUCK, 1, false);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        item.setItemMeta(meta);
-    }
-
-    private void setCustomModelData(Integer value) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
-
-        meta.setCustomModelData(value);
         item.setItemMeta(meta);
     }
 
@@ -226,7 +188,7 @@ public class ItemBuilder {
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         if (meta == null) return;
 
-        meta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
+        meta.setOwner(owner);
         item.setItemMeta(meta);
     }
 
@@ -271,13 +233,5 @@ public class ItemBuilder {
 
     public ItemStack build() {
         return item.clone();
-    }
-
-    public Integer getSlot() {
-        return slot;
-    }
-
-    public List<InventoryUtils.Action> getActions() {
-        return actions;
     }
 }

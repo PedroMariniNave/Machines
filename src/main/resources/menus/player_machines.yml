@@ -11,7 +11,7 @@ Nothing:
   slot: 22
 
 Enable-All:
-  type: PLAYER_HEAD
+  type: SKULL_ITEM
   owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
   name: '&aLigar'
   lore:
@@ -20,7 +20,7 @@ Enable-All:
   slot: 48
 
 Sell-All:
-  type: PLAYER_HEAD
+  type: SKULL_ITEM
   owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmNjN2Y2NDQxYmQ3MWZjOTc0ZTk5NzdiY2IyMmVmYmM0YjYxMjc3YzQ5ZWZiMjQyM2FiOTE1NDg5NWJlIn19fQ==
   name: '&aVender Drops'
   lore:
@@ -35,7 +35,7 @@ Sell-All:
   slot: 49
 
 Disable-All:
-  type: PLAYER_HEAD
+  type: SKULL_ITEM
   owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZkZTNiZmNlMmQ4Y2I3MjRkZTg1NTZlNWVjMjFiN2YxNWY1ODQ2ODRhYjc4NTIxNGFkZDE2NGJlNzYyNGIifX19
   name: '&cDesligar'
   lore:

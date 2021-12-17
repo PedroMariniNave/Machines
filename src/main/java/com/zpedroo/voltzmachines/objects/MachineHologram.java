@@ -5,14 +5,14 @@ import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.zpedroo.voltzmachines.VoltzMachines;
 import com.zpedroo.voltzmachines.utils.config.Settings;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class MachineHologram {
+
+    private PlacedMachine machine;
 
     private String[] hologramLines;
     private TextLine[] textLines;
@@ -20,59 +20,80 @@ public class MachineHologram {
 
     private Hologram hologram;
 
-    public MachineHologram(PlayerMachine machine) {
+    public MachineHologram(PlacedMachine machine) {
+        this.machine = machine;
         this.hologramLines = Settings.MACHINE_HOLOGRAM;
-        Bukkit.getScheduler().runTaskLater(VoltzMachines.get(), () -> update(machine), 0L);
+        this.updateHologramAndItem();
     }
 
-    public void update(PlayerMachine machine) {
-        machine.getLocation().getBlock().setType(machine.getMachine().getBlock());
+    public void updateHologramAndItem() {
+        if (machine.isDeleted()) return;
 
-        if (hologram != null && hologram.isDeleted()) return;
-
-        if (hologram == null) {
-            hologram = HologramsAPI.createHologram(VoltzMachines.get(), machine.getLocation().clone().add(0.5D, 3.95, 0.5D));
-            textLines = new TextLine[hologramLines.length];
-
-            for (int i = 0; i < hologramLines.length; i++) {
-                textLines[i] = hologram.insertTextLine(i, machine.replace(hologramLines[i]));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                updateBlock();
+                updateHologram();
+                spawnItem();
             }
+        }.runTaskLater(VoltzMachines.get(), 0L);
+    }
 
-            hologram.getVisibilityManager().setVisibleByDefault(false);
+    public void removeHologramAndItem() {
+        removeHologram();
+        removeItem();
+    }
 
-            for (Entity nearEntity : machine.getLocation().getWorld().getNearbyEntities(machine.getLocation().clone().add(0.5D, 0D, 0.5D), 1D, 1D, 1D)) {
-                if (nearEntity.hasMetadata("Machine Item")) nearEntity.remove();
-            }
+    private void updateHologram() {
+        if (machine.isDeleted()) return;
+        if (hologram == null || hologram.isDeleted()) return;
 
-            displayItem = machine.getLocation().getWorld().dropItem(machine.getLocation().clone().add(0.5D, 1D, 0.5D), machine.getMachine().getDisplayItem());
-            displayItem.setVelocity(new Vector(0, 0.1, 0));
-            displayItem.setPickupDelay(Integer.MAX_VALUE);
-            displayItem.setMetadata("Machine Item", new FixedMetadataValue(VoltzMachines.get(), true));
-            displayItem.setCustomNameVisible(false);
-        } else {
-            for (int i = 0; i < hologramLines.length; i++) {
-                this.textLines[i].setText(machine.replace(hologramLines[i]));
-            }
+        for (int i = 0; i < hologramLines.length; i++) {
+            textLines[i].setText(machine.replace(hologramLines[i]));
         }
     }
 
-    public void showTo(Player player) {
-        if (hologram == null) return;
+    public void spawnHologram() {
+        if (machine.isDeleted()) return;
+        if (hologram != null && !hologram.isDeleted()) return;
 
-        this.hologram.getVisibilityManager().showTo(player);
+        hologram = HologramsAPI.createHologram(VoltzMachines.get(), machine.getLocation().clone().add(0.5D, 3.95, 0.5D));
+        textLines = new TextLine[hologramLines.length];
+
+        for (int i = 0; i < hologramLines.length; i++) {
+            textLines[i] = hologram.insertTextLine(i, machine.replace(hologramLines[i]));
+        }
     }
 
-    public void hideTo(Player player) {
-        if (hologram == null) return;
+    public void removeHologram() {
+        if (hologram == null || hologram.isDeleted()) return;
 
-        this.hologram.getVisibilityManager().hideTo(player);
+        hologram.delete();
+        hologram = null;
     }
 
-    public void remove() {
-        if (hologram == null) return;
+    private void spawnItem() {
+        if (machine.isDeleted()) return;
+        if (displayItem != null && !displayItem.isDead()) return;
 
-        this.hologram.delete();
-        this.displayItem.remove();
-        this.hologram = null;
+        displayItem = machine.getLocation().getWorld().dropItem(machine.getLocation().clone().add(0.5D, 1D, 0.5D), machine.getMachine().getDisplayItem());
+        displayItem.setVelocity(new Vector(0, 0.1, 0));
+        displayItem.setPickupDelay(Integer.MAX_VALUE);
+        displayItem.setMetadata("***", new FixedMetadataValue(VoltzMachines.get(), true));
+        displayItem.setCustomNameVisible(false);
+    }
+
+    private void removeItem() {
+        if (displayItem == null || displayItem.isDead()) return;
+
+        displayItem.remove();
+        displayItem = null;
+    }
+
+    private void updateBlock() {
+        if (machine.getLocation().getBlock().getType().equals(machine.getMachine().getBlock())) return;
+
+        machine.getLocation().getBlock().setType(machine.getMachine().getBlock());
+        machine.getLocation().getBlock().setData(machine.getMachine().getBlockData());
     }
 }

@@ -1,161 +1,139 @@
 package com.zpedroo.voltzmachines.utils.builder;
 
-import org.apache.commons.lang.Validate;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static com.zpedroo.voltzmachines.utils.builder.InventoryUtils.*;
+
 public class InventoryBuilder {
 
-    private Player player;
+    private Inventory inventory;
     private String title;
-    private Integer size;
-    private Integer nextPageSlot;
-    private Integer previousPageSlot;
-    private ItemStack nextPageItem;
+    private int size;
+    private int previousPageSlot;
+    private int nextPageSlot;
     private ItemStack previousPageItem;
-    private Inventory defaultInventory;
-    private Map<Integer, Inventory> inventories;
+    private InventoryBuilder previousPageInventory;
+    private ItemStack nextPageItem;
+    private InventoryBuilder nextPageInventory;
+    private Table<Integer, ItemStack, List<Action>> defaultItems;
+    private Table<Integer, ActionType, Action> actions;
 
-    public InventoryBuilder(Player player, Inventory defaultInventory, String title, List<ItemBuilder> builders, Integer nextPageSlot, Integer previousPageSlot, ItemStack nextPageItem, ItemStack previousPageItem) {
-        this.player = player;
-        this.defaultInventory = defaultInventory;
+    public InventoryBuilder(String title, int size) {
+        this(title, size, null, -1, null, null, -1, null);
+    }
+
+    public InventoryBuilder(String title, int size, ItemStack previousPageItem, int previousPageSlot, ItemStack nextPageItem, int nextPageSlot) {
+        this(title, size, previousPageItem, previousPageSlot, null, nextPageItem, nextPageSlot, null);
+    }
+
+    public InventoryBuilder(String title, int size, ItemStack previousPageItem, int previousPageSlot, InventoryBuilder previousPageInventory, ItemStack nextPageItem, int nextPageSlot, Table<Integer, ItemStack, List<Action>> defaultItems) {
+        this.inventory = Bukkit.createInventory(null, size, title);
         this.title = title;
-        this.size = defaultInventory.getSize();
-        this.nextPageSlot = nextPageSlot;
-        this.previousPageSlot = previousPageSlot;
-        this.nextPageItem = nextPageItem;
+        this.size = size;
         this.previousPageItem = previousPageItem;
-        this.inventories = new HashMap<>(32);
-        this.create(builders, 1);
-        this.open(1);
+        this.previousPageSlot = previousPageSlot;
+        this.previousPageInventory = previousPageInventory;
+        this.nextPageItem = nextPageItem;
+        this.nextPageSlot = nextPageSlot;
+        this.defaultItems = defaultItems;
+        this.actions = HashBasedTable.create();
     }
 
-    public static InventoryBuilder build(Player player, Inventory defaultInventory, String title, List<ItemBuilder> builders) {
-        return build(player, defaultInventory, title, builders, null, null, null, null);
-    }
-
-    public static InventoryBuilder build(Player player, Inventory defaultInventory, String title, List<ItemBuilder> builders, Integer nextPageSlot, Integer previousPageSlot, ItemStack nextPageItem, ItemStack previousPageItem) {
-        return new InventoryBuilder(player, defaultInventory, title, builders, nextPageSlot, previousPageSlot, nextPageItem, previousPageItem);
-    }
-
-    private Player getPlayer() {
-        return player;
-    }
-
-    private Inventory getDefaultInventory() {
-        return defaultInventory;
-    }
-
-    private String getTitle() {
-        return title;
-    }
-
-    private Integer getSize() {
-        return size;
-    }
-
-    private Integer getPreviousPageSlot() {
-        return previousPageSlot;
-    }
-
-    private Integer getNextPageSlot() {
-        return nextPageSlot;
-    }
-
-    private ItemStack getPreviousPageItem() {
-        return previousPageItem;
-    }
-
-    private ItemStack getNextPageItem() {
-        return nextPageItem;
-    }
-
-    private Map<Integer, Inventory> getInventories() {
-        return inventories;
-    }
-
-    public void open(Integer page) {
-        getPlayer().openInventory(getInventories().get(page));
-    }
-
-    private void create(List<ItemBuilder> builders, Integer page) {
-        Inventory inventory = Bukkit.createInventory(null, size, title);
-
-        // clone all items
-        for (int slot = 0; slot < defaultInventory.getSize(); ++slot) {
-            ItemStack item = defaultInventory.getItem(slot);
-            if (item == null || item.getType().equals(Material.AIR)) continue;
-
-            inventory.setItem(slot, item);
-        }
-
-        if (InventoryUtils.getInstance().hasAction(defaultInventory)) {
-            // clone all actions
-            for (InventoryUtils.Action action : InventoryUtils.getInstance().getInventoryActions(defaultInventory)) {
-                if (action == null) continue;
-
-                InventoryUtils.getInstance().addAction(inventory, action.getItem(), action.getAction(), action.getType());
+    public void open(Player player) {
+        if (previousPageInventory != null) {
+            if (previousPageItem != null && previousPageSlot != -1 && inventory.getItem(previousPageSlot) == null) {
+                addItem(previousPageItem, previousPageSlot, () -> {
+                    previousPageInventory.open(player);
+                }, ActionType.ALL_CLICKS);
             }
         }
 
-        List<ItemBuilder> remaining = new ArrayList<>(builders);
-        // Slots can be duplicated because of multiple pages, but Sets don't accept
-        // repeated values, so we can get the amount of slots per page with that.
-        Set<Integer> slots = new HashSet<>(builders.size());
-        new HashSet<>(builders).forEach(builder -> {
-            slots.add(builder.getSlot());
-        });
-        int itemsPerPage = slots.size();
-
-        for (int i = 0; i < builders.size(); ++i) {
-            if (i >= itemsPerPage) {
-                Validate.notNull(nextPageItem, "Next page item cannot be null!");
-                Validate.notNull(nextPageSlot, "Next page slot cannot be null!");
-
-                InventoryUtils.getInstance().addAction(inventory, nextPageItem, () -> {
-                    open(page+1);
-                }, InventoryUtils.ActionType.ALL_CLICKS);
-
-                inventory.setItem(nextPageSlot, nextPageItem);
-
-                inventories.put(page, inventory);
-                create(remaining, page+1);
-                break;
+        if (nextPageInventory != null) {
+            if (nextPageItem != null && nextPageSlot != -1 && inventory.getItem(nextPageSlot) == null) {
+                addItem(nextPageItem, nextPageSlot, () -> {
+                    nextPageInventory.open(player);
+                }, ActionType.ALL_CLICKS);
             }
+        }
 
-            ItemBuilder builder = builders.get(i);
-            ItemStack item = builder.build();
-            Integer slot = builder.getSlot();
-            List<InventoryUtils.Action> actions = builder.getActions();
-
-            if (actions != null && actions.size() != 0) {
-                for (InventoryUtils.Action action : actions) {
-                    InventoryUtils.getInstance().addAction(inventory, item, action.getAction(), action.getType());
+        if (defaultItems != null) {
+            for (Integer slot : defaultItems.rowKeySet()) {
+                if (inventory.getItem(slot) != null) continue;
+                for (ItemStack item : defaultItems.row(slot).keySet()) {
+                    List<Action> actions = defaultItems.get(slot, item);
+                    addItem(item, slot);
+                    actions.forEach(action -> addAction(slot, action.getAction(), action.getActionType()));
                 }
-            } else {
-                InventoryUtils.getInstance().addAction(inventory, item, null, InventoryUtils.ActionType.ALL_CLICKS);
+            }
+        }
+
+        player.openInventory(inventory);
+        InventoryUtils.get().getViewers().put(player, this);
+    }
+
+    public void close(Player player) {
+        player.closeInventory();
+    }
+
+    public void addItem(@NotNull ItemStack item, int slot) {
+        addItem(item, slot, null, null);
+    }
+
+    public void addItem(@NotNull ItemStack item, int slot, Runnable action, ActionType actionType) {
+        if (inventory.getItem(slot) != null) {
+            if (nextPageInventory == null) {
+                if (nextPageItem == null || nextPageSlot == -1) return;
+
+                nextPageInventory = new InventoryBuilder(title, size, previousPageItem, previousPageSlot, this, nextPageItem, nextPageSlot, defaultItems);
             }
 
-            inventory.setItem(slot, item);
-            remaining.remove(builder);
+            nextPageInventory.addItem(item, slot, action, actionType);
+            return;
         }
 
-        if (page != 1) {
-            Validate.notNull(getPreviousPageItem(), "Previous page item cannot be null!");
-            Validate.notNull(getPreviousPageSlot(), "Previous page slot cannot be null!");
+        inventory.setItem(slot, item);
 
-            InventoryUtils.getInstance().addAction(inventory, previousPageItem, () -> {
-                open(page-1);
-            }, InventoryUtils.ActionType.ALL_CLICKS);
+        if (action == null || actionType == null) return;
 
-            inventory.setItem(previousPageSlot, previousPageItem);
-        }
+        addAction(slot, action, actionType);
+    }
 
-        inventories.put(page, inventory);
+    public void addAction(int slot, Runnable action, ActionType actionType) {
+        actions.put(slot, actionType, new Action(action, actionType));
+    }
+
+    public void addDefaultItem(@NotNull ItemStack item, int slot) {
+        addDefaultItem(item, slot, null, null);
+    }
+
+    public void addDefaultItem(@NotNull ItemStack item, int slot, Runnable action, ActionType actionType) {
+        addDefaultAction(item, slot, action, actionType);
+    }
+
+    public void addDefaultAction(@NotNull ItemStack item, int slot, Runnable action, ActionType actionType) {
+        if (defaultItems == null) defaultItems = HashBasedTable.create();
+
+        List<Action> defaultActions = defaultItems.contains(slot, item) ? defaultItems.get(slot, item) : new ArrayList<>(1);
+        if (action != null && actionType != null) defaultActions.add(new Action(action, actionType));
+
+        defaultItems.put(slot, item, defaultActions);
+
+        if (nextPageInventory != null) nextPageInventory.addDefaultAction(item, slot, action, actionType);
+    }
+
+    protected Inventory getInventory() {
+        return inventory;
+    }
+
+    protected Action getAction(int slot, ActionType actionType) {
+        return actions.get(slot, actionType);
     }
 }

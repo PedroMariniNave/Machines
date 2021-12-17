@@ -3,7 +3,7 @@ Inventory:
   size: 45
   items:
     1:
-      type: PLAYER_HEAD
+      type: SKULL_ITEM
       owner: '{friend}'
       name: '&a{friend}'
       lore:
@@ -23,13 +23,13 @@ Inventory:
     add_stack:
       slot: 20
       true:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
         name: '&aAdicionar Stack'
         lore:
           - '&7Clique para remover essa permissão!'
       false:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmExN2U5NzAzN2NlMzUzZjg1ZjVjNjVkZjQzNWQyOTQ0OWE4OGRhNDQ0MmU0MzYxY2Y5OWFiYmUxZjg5MmZiIn19fQ==
         name: '&cAdicionar Stack'
         lore:
@@ -37,13 +37,13 @@ Inventory:
     remove_stack:
       slot: 21
       true:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
         name: '&aRemover Stack'
         lore:
           - '&7Clique para remover essa permissão!'
       false:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmExN2U5NzAzN2NlMzUzZjg1ZjVjNjVkZjQzNWQyOTQ0OWE4OGRhNDQ0MmU0MzYxY2Y5OWFiYmUxZjg5MmZiIn19fQ==
         name: '&cRemover Stack'
         lore:
@@ -51,13 +51,13 @@ Inventory:
     add_friends:
       slot: 22
       true:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
         name: '&aAdicionar Amigos'
         lore:
           - '&7Clique para remover essa permissão!'
       false:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmExN2U5NzAzN2NlMzUzZjg1ZjVjNjVkZjQzNWQyOTQ0OWE4OGRhNDQ0MmU0MzYxY2Y5OWFiYmUxZjg5MmZiIn19fQ==
         name: '&cAdicionar Amigos'
         lore:
@@ -65,13 +65,13 @@ Inventory:
     remove_friends:
       slot: 23
       true:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
         name: '&aRemover Amigos'
         lore:
           - '&7Clique para remover essa permissão!'
       false:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmExN2U5NzAzN2NlMzUzZjg1ZjVjNjVkZjQzNWQyOTQ0OWE4OGRhNDQ0MmU0MzYxY2Y5OWFiYmUxZjg5MmZiIn19fQ==
         name: '&cRemover Amigos'
         lore:
@@ -79,13 +79,13 @@ Inventory:
     sell_drops:
       slot: 24
       true:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==
         name: '&aVender Drops'
         lore:
           - '&7Clique para remover essa permissão!'
       false:
-        type: PLAYER_HEAD
+        type: SKULL_ITEM
         owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmExN2U5NzAzN2NlMzUzZjg1ZjVjNjVkZjQzNWQyOTQ0OWE4OGRhNDQ0MmU0MzYxY2Y5OWFiYmUxZjg5MmZiIn19fQ==
         name: '&cVender Drops'
         lore:

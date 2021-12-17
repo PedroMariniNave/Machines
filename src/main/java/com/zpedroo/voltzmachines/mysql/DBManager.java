@@ -3,16 +3,16 @@ package com.zpedroo.voltzmachines.mysql;
 import com.zpedroo.voltzmachines.managers.DataManager;
 import com.zpedroo.voltzmachines.objects.Machine;
 import com.zpedroo.voltzmachines.objects.Manager;
-import com.zpedroo.voltzmachines.objects.PlayerMachine;
+import com.zpedroo.voltzmachines.objects.PlacedMachine;
 import org.bukkit.Location;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.*;
 import java.util.*;
 
 public class DBManager extends DataManager {
 
-    public void saveMachine(PlayerMachine machine) {
+    public void saveMachine(PlacedMachine machine) {
         if (contains(serializeLocation(machine.getLocation()), "location")) {
             String query = "UPDATE `" + DBConnection.TABLE + "` SET" +
                     "`location`='" + serializeLocation(machine.getLocation()) + "', " +
@@ -44,13 +44,13 @@ public class DBManager extends DataManager {
         executeUpdate(query);
     }
 
-    public void deleteMachine(String location) {
-        String query = "DELETE FROM `" + DBConnection.TABLE + "` WHERE `location`='" + location + "';";
+    public void deleteMachine(Location location) {
+        String query = "DELETE FROM `" + DBConnection.TABLE + "` WHERE `location`='" + serializeLocation(location) + "';";
         executeUpdate(query);
     }
 
-    public Map<Location, PlayerMachine> getPlacedMachines() {
-        Map<Location, PlayerMachine> machines = new HashMap<>(5120);
+    public Map<Location, PlacedMachine> getPlacedMachines() {
+        Map<Location, PlacedMachine> machines = new HashMap<>(512);
 
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -65,20 +65,21 @@ public class DBManager extends DataManager {
             while (result.next()) {
                 Location location = deserializeLocation(result.getString(1));
                 UUID ownerUUID = UUID.fromString(result.getString(2));
-                BigDecimal stack = result.getBigDecimal(3);
-                BigDecimal fuel = result.getBigDecimal(4);
-                BigDecimal drops = result.getBigDecimal(5);
-                Integer integrity = result.getInt(6);
+                BigInteger stack = result.getBigDecimal(3).toBigInteger();
+                BigInteger fuel = result.getBigDecimal(4).toBigInteger();
+                BigInteger drops = result.getBigDecimal(5).toBigInteger();
+                BigInteger integrity = result.getBigDecimal(6).toBigInteger();
                 Machine machine = getMachine(result.getString(7));
-                List<Manager> managers = deserializeManagers(result.getString(8));
-                Boolean infiniteFuel = result.getBoolean(9);
-                Boolean infiniteIntegrity = result.getBoolean(10);
-                PlayerMachine playerMachine = new PlayerMachine(location, ownerUUID, stack.toBigInteger(), fuel.toBigInteger(), drops.toBigInteger(), integrity, machine, managers, infiniteFuel, infiniteIntegrity);
+                List<Manager> managers = DataManager.getInstance().deserializeManagers(result.getString(8));
+                boolean infiniteEnergy = result.getBoolean(9);
+                boolean infiniteIntegrity = result.getBoolean(10);
 
-                machines.put(location, playerMachine);
+                PlacedMachine placedMachine = new PlacedMachine(location, ownerUUID, stack, fuel, drops, integrity, machine, managers, infiniteEnergy, infiniteIntegrity);
 
-                List<PlayerMachine> machinesList = getCache().getPlayerMachinesByUUID(ownerUUID);
-                machinesList.add(playerMachine);
+                machines.put(location, placedMachine);
+
+                List<PlacedMachine> machinesList = getCache().getPlayerMachinesByUUID(ownerUUID);
+                machinesList.add(placedMachine);
 
                 getCache().setUUIDMachines(ownerUUID, machinesList);
             }
@@ -136,7 +137,7 @@ public class DBManager extends DataManager {
     }
 
     protected void createTable() {
-        String query = "CREATE TABLE IF NOT EXISTS `" + DBConnection.TABLE + "` (`location` VARCHAR(255), `uuid` VARCHAR(255), `stack` DECIMAL(40,0), `fuel` DECIMAL(40,0), `drops` DECIMAL(40,0), `integrity` INTEGER, `type` VARCHAR(32), `managers` LONGTEXT, `infinite_fuel` BOOLEAN, `infinite_integrity` BOOLEAN, PRIMARY KEY(`location`));";
+        String query = "CREATE TABLE IF NOT EXISTS `" + DBConnection.TABLE + "` (`location` VARCHAR(255), `uuid` VARCHAR(255), `stack` DECIMAL(40,0), `fuel` DECIMAL(40,0), `drops` DECIMAL(40,0), `integrity` DECIMAL(40,0), `type` VARCHAR(32), `managers` LONGTEXT, `infinite_fuel` BOOLEAN, `infinite_integrity` BOOLEAN, PRIMARY KEY(`location`));";
         executeUpdate(query);
     }
 

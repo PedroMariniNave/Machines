@@ -1,27 +1,97 @@
 Inventory:
   title: "Máquinas"
-  size: 45
+  size: 54
   slots: 11,12,13,14,15,20,21,22,23,24,29,30,31,32,33
   next-page-slot: 26 # só vai aparecer se tiver próxima página
   previous-page-slot: 18 # só vai aparecer se tiver página anterior
   items:
     emerald:
-      type: PLAYER_HEAD
-      owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODZhZGRiZDVkZWRhZDQwOTk5NDczYmU0YTdmNDhmNjIzNmE3OWEwZGNlOTcxYjVkYmQ3MzcyMDE0YWUzOTRkIn19fQ==
-      name: '&2Máquina de Esmeralda &7[&fx?&7]'
-      lore:
-        - '&7Preço: &e{price}'
-        - ''
-        - '&7Abaixo estão as informações'
-        - '&7da cotação dos drops!'
-        - ''
-        - ' &8▶ &7Valor atual: &e{drops_now}'
-        - ' &8▶ &7Valor &f24 horas &7atrás: &e{drops_previous}'
-        - ' &8▶ &7Estatística: {statistics}'
-        - ''
-        - '&7Próxima cotação em:'
-        - ''
-        - ' &8▶ &f{update}'
-        - ''
-        - '&7Clique para escolher a quantia!'
       price: 50000000
+      locked:
+        type: SKULL_ITEM
+        owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2VkMWFiYTczZjYzOWY0YmM0MmJkNDgxOTZjNzE1MTk3YmUyNzEyYzNiOTYyYzk3ZWJmOWU5ZWQ4ZWZhMDI1In19fQ==
+        name: '&cMáquina de Esmeralda &7[&fx?&7]'
+        lore:
+          - '&7Preço: {price}'
+          - ''
+          - '&7Abaixo estão as informações'
+          - '&7da cotação dos drops!'
+          - ''
+          - ' &8▶ &7Valor atual: &e{drops_now}'
+          - ' &8▶ &7Valor &f24 horas &7atrás: &e{drops_previous}'
+          - ' &8▶ &7Estatística: {statistics}'
+          - ''
+          - '&7Próxima cotação em:'
+          - ''
+          - ' &8▶ &f{update}'
+          - ''
+          - '&cNecessário o rank 2 para desbloquear!'
+      unlocked:
+        type: SKULL_ITEM
+        owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODZhZGRiZDVkZWRhZDQwOTk5NDczYmU0YTdmNDhmNjIzNmE3OWEwZGNlOTcxYjVkYmQ3MzcyMDE0YWUzOTRkIn19fQ==
+        name: '&2Máquina de Esmeralda &7[&fx?&7]'
+        lore:
+          - '&7Preço: {price}'
+          - ''
+          - '&7Abaixo estão as informações'
+          - '&7da cotação dos drops!'
+          - ''
+          - ' &8▶ &7Valor atual: &e{drops_now}'
+          - ' &8▶ &7Valor &f24 horas &7atrás: &e{drops_previous}'
+          - ' &8▶ &7Estatística: {statistics}'
+          - ''
+          - '&7Próxima cotação em:'
+          - ''
+          - ' &8▶ &f{update}'
+          - ''
+          - '&7Clique para escolher a quantia!'
+
+Buy-Fuel:
+  slot: 48
+  default-price: 100000
+  type: SKULL_ITEM
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmYzNWFkY2IwMThiNDhmNmU3ZGRhMDBlYWRjNTAzMWM5YjEyMzQyZGE4NmUyMjdjY2IwOWEyZTc2YjBiMGYyMCJ9fX0=
+  name: '&4Combustível &7[&f+??&4&l♨&7]'
+  lore:
+    - '&7Preço: &f???'
+    - ''
+    - '&7Combustível é usado para abastecer'
+    - '&7todos os tipos de máquinas!'
+    - ''
+    - '&7Com &f1 &7litro você consegue'
+    - '&7abastecer &f10 &7máquinas!'
+    - ''
+    - '&7Clique para escolher como deseja pagar!'
+
+Buy-Pickaxe:
+  slot: 49
+  default-price: 100000000
+  type: DIAMOND_PICKAXE
+  glow: true
+  hide-attributes: true
+  name: '&4Toque Suave ∞'
+  lore:
+    - '&7Preço: &f???'
+    - ''
+    - '&7Essa picareta possui suavidade infinita,'
+    - '&7garantindo que nenhuma &fmáquina &7seja'
+    - '&7destruída ao remover!'
+    - ''
+    - '&7Clique para escolher como deseja pagar!'
+
+Buy-Repair:
+  slot: 50
+  default-price: 10000
+  type: SKULL_ITEM
+  owner: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWVmNWFjZjEzNGZhOTUyZjEzZmRmMGIzODk5MDYwY2MxOGViYzBhOTcxMzQ3ZTQ1YTMxZWNmOTVhNGIwYjMxYyJ9fX0=
+  name: '&4Reparador de Máquinas &7[&f+??%&7]'
+  lore:
+    - '&7Preço: &f???'
+    - ''
+    - '&7Máquinas requerem uma boa manutenção'
+    - '&7para funcionarem corretamente!'
+    - ''
+    - '&7Use esse item para reparar'
+    - '&7suas máquinas!'
+    - ''
+    - '&7Clique para escolher como deseja pagar!'

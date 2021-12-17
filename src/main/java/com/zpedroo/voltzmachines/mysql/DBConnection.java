@@ -26,7 +26,7 @@ public class DBConnection {
     }
 
     private void enable(FileConfiguration file) {
-        hikari.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
+        hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
         hikari.addDataSourceProperty("serverName", file.getString("MySQL.host"));
         hikari.addDataSourceProperty("port", file.getInt("MySQL.port"));
         hikari.addDataSourceProperty("databaseName", file.getString("MySQL.database"));

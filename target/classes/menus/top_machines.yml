@@ -4,10 +4,12 @@ Inventory:
   slots: 11,12,13,14,15,20,21,22,23,24
 
 Item:
-  type: PLAYER_HEAD
+  type: SKULL_ITEM
   owner: "{player}"
   name: "&6{player} &7[&f{pos}º&7]"
   lore:
     - '&7Abaixo estão as informações:'
     - ''
     - ' &8▶ &7Máquinas: &f{machines}'
+    - ''
+    - '&7Clique para ver as máquinas desse jogador!'

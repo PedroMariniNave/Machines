@@ -3,11 +3,14 @@ package com.zpedroo.voltzmachines.managers;
 import com.zpedroo.voltzmachines.VoltzMachines;
 import com.zpedroo.voltzmachines.managers.cache.DataCache;
 import com.zpedroo.voltzmachines.mysql.DBConnection;
+import com.zpedroo.voltzmachines.objects.Bonus;
 import com.zpedroo.voltzmachines.objects.Machine;
 import com.zpedroo.voltzmachines.objects.Manager;
-import com.zpedroo.voltzmachines.objects.PlayerMachine;
+import com.zpedroo.voltzmachines.objects.PlacedMachine;
+import com.zpedroo.voltzmachines.utils.FileUtils;
 import com.zpedroo.voltzmachines.utils.builder.ItemBuilder;
-import com.zpedroo.voltzmachines.utils.enums.Permission;
+import com.zpedroo.voltzmachines.enums.Permission;
+import com.zpedroo.voltzmachines.utils.formatter.NumberFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,10 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
-import static com.zpedroo.voltzmachines.utils.config.Settings.*;
 
 public class DataManager {
 
@@ -35,7 +35,9 @@ public class DataManager {
         instance = this;
         this.dataCache = new DataCache();
         this.loadConfigMachines();
+        this.loadConfigBonuses();
         VoltzMachines.get().getServer().getScheduler().runTaskLaterAsynchronously(VoltzMachines.get(), this::loadPlacedMachines, 20L);
+        VoltzMachines.get().getServer().getScheduler().runTaskLaterAsynchronously(VoltzMachines.get(), this::loadTopMachines, 20L);
     }
 
     private void loadConfigMachines() {
@@ -49,49 +51,65 @@ public class DataManager {
             FileConfiguration file = YamlConfiguration.loadConfiguration(fl);
 
             ItemStack item = ItemBuilder.build(file, "Machine-Settings.item").build();
-            Material block = Material.valueOf(file.getString("Machine-Settings.machine-block"));
+
+            String[] materialSplit = file.getString("Machine-Settings.machine-block").split(":");
+
+            Material block = Material.valueOf(materialSplit[0]);
+            byte blockData = materialSplit.length > 1 ? Byte.parseByte(materialSplit[1]) : 0;
             String type = fl.getName().replace(".yml", "");
             String typeTranslated = file.getString("Machine-Settings.type-translated");
             String displayName = ChatColor.translateAlternateColorCodes('&', file.getString("Machine-Settings.display-name"));
-            Integer delay = file.getInt("Machine-Settings.drops.delay");
-            BigInteger amount = new BigInteger(file.getString("Machine-Settings.drops.amount"));
-            BigInteger dropsValue = new BigInteger(file.getString("Machine-Settings.drops.price"));
-            BigInteger dropsPreviousValue = new BigInteger(file.getString("Machine-Settings.drops.previous"));
-            BigInteger maxStack = new BigInteger(file.getString("Machine-Settings.max-stack"));
-            String permission = file.getString("Machine-Settings.place-permission", "NULL");
+            int delay = file.getInt("Machine-Settings.drops.delay");
+            BigInteger amount = NumberFormatter.getInstance().filter(file.getString("Machine-Settings.drops.amount"));
+            BigInteger dropsValue = NumberFormatter.getInstance().filter(file.getString("Machine-Settings.drops.price"));
+            BigInteger dropsPreviousValue = NumberFormatter.getInstance().filter(file.getString("Machine-Settings.drops.previous"));
+            BigInteger dropsMinimumValue = NumberFormatter.getInstance().filter(file.getString("Machine-Settings.drops.min"));
+            BigInteger dropsMaximumValue = NumberFormatter.getInstance().filter(file.getString("Machine-Settings.drops.max"));
+            BigInteger maxStack = NumberFormatter.getInstance().filter(file.getString("Machine-Settings.max-stack"));
+            String permission = file.getString("Machine-Settings.permission", null);
             List<String> commands = file.getStringList("Machine-Settings.commands");
 
+            Machine machine = new Machine(item, block, blockData, type, typeTranslated, displayName, delay, amount, dropsValue, dropsPreviousValue, dropsMinimumValue, dropsMaximumValue, maxStack, permission, commands);
+            
             if (dropsValue.signum() <= 0) {
-                dropsValue = new BigInteger(String.format("%.0f", ThreadLocalRandom.current().nextDouble(MIN_PRICE.doubleValue(), MAX_PRICE.doubleValue())));
-                try {
-                    file.set("Machine-Settings.drops.price", dropsValue.longValue());
-                    file.save(fl);
-                } catch (Exception ex) {
-                    // ignore
-                }
+                MachineManager.updatePrice(machine);
             }
 
-            cache(new Machine(item, block, type, typeTranslated, displayName, delay, amount, dropsValue, dropsPreviousValue, maxStack, permission, commands));
+            cache(machine);
+        }
+    }
+
+    private void loadConfigBonuses() {
+        FileUtils.Files file = FileUtils.Files.CONFIG;
+        for (String str : FileUtils.get().getSection(file, "Bonus")) {
+            String permission = FileUtils.get().getString(file, "Bonus." + str + ".permission");
+            double bonusPercentage = FileUtils.get().getDouble(file, "Bonus." + str + ".bonus");
+
+            cache(new Bonus(permission, bonusPercentage));
         }
     }
 
     private void loadPlacedMachines() {
-        dataCache.setPlayerMachines(DBConnection.getInstance().getDBManager().getPlacedMachines());
+        dataCache.setPlacedMachines(DBConnection.getInstance().getDBManager().getPlacedMachines());
+    }
+
+    private void loadTopMachines() {
+        dataCache.setTopMachines(DBConnection.getInstance().getDBManager().getCache().getTopMachines());
     }
 
     public void saveAll() {
-        new HashSet<>(dataCache.getDeletedMachines()).forEach(machine -> {
-            DBConnection.getInstance().getDBManager().deleteMachine(serializeLocation(machine));
+        new HashSet<>(dataCache.getDeletedMachines()).forEach(machineLocation -> {
+            DBConnection.getInstance().getDBManager().deleteMachine(machineLocation);
         });
 
         dataCache.getDeletedMachines().clear();
 
-        new HashSet<>(dataCache.getPlayerMachines().values()).forEach(machine -> {
+        new HashSet<>(dataCache.getPlacedMachines().values()).forEach(machine -> {
             if (machine == null) return;
             if (!machine.isQueueUpdate()) return;
 
             DBConnection.getInstance().getDBManager().saveMachine(machine);
-            machine.setQueueUpdate(false);
+            machine.setUpdate(false);
         });
     }
 
@@ -103,10 +121,14 @@ public class DataManager {
         dataCache.getMachines().put(machine.getType().toUpperCase(), machine);
     }
 
-    private Map<UUID, BigInteger> getTopMachinesOrdered() {
-        Map<UUID, BigInteger> playerMachines = new HashMap<>(dataCache.getPlayerMachinesByUUID().size());
+    private void cache(Bonus bonus) {
+        dataCache.getBonuses().add(bonus);
+    }
 
-        new HashSet<>(dataCache.getPlayerMachinesByUUID().values()).forEach(machines -> {
+    private Map<UUID, BigInteger> getTopMachinesOrdered() {
+        Map<UUID, BigInteger> playerMachines = new HashMap<>(dataCache.getPlacedMachinesByUUID().size());
+
+        new HashSet<>(dataCache.getPlacedMachinesByUUID().values()).forEach(machines -> {
             new HashSet<>(machines).forEach(machine -> {
                 playerMachines.put(machine.getOwnerUUID(), machine.getStack().add(playerMachines.getOrDefault(machine.getOwnerUUID(), BigInteger.ZERO)));
             });
@@ -123,7 +145,7 @@ public class DataManager {
     public String serializeManagers(List<Manager> managers) {
         if (managers == null || managers.isEmpty()) return "";
 
-        StringBuilder serialized = new StringBuilder(32);
+        StringBuilder serialized = new StringBuilder(16);
 
         for (Manager manager : managers) {
             serialized.append(manager.getUUID().toString()).append("#");
@@ -141,7 +163,7 @@ public class DataManager {
     public List<Manager> deserializeManagers(String managers) {
         if (managers == null || managers.isEmpty()) return new ArrayList<>(5);
 
-        List<Manager> ret = new ArrayList<>(64);
+        List<Manager> ret = new ArrayList<>(4);
         String[] split = managers.split(",");
 
         for (String str : split) {
@@ -185,8 +207,20 @@ public class DataManager {
         return new Location(Bukkit.getWorld(locationSplit[0]), x, y, z);
     }
 
-    public PlayerMachine getMachine(Location location) {
-        return dataCache.getPlayerMachines().get(location);
+    public List<PlacedMachine> getPlacedMachinesByUUID(UUID uuid) {
+        List<PlacedMachine> placedMachines = dataCache.getPlayerMachinesByUUID(uuid);
+        if (placedMachines == null) {
+            placedMachines = DBConnection.getInstance().getDBManager().getPlacedMachinesByUUID(uuid);
+            dataCache.getPlacedMachinesByUUID().put(uuid, placedMachines);
+        }
+
+        return placedMachines;
+    }
+
+    public PlacedMachine getPlacedMachine(Location location) {
+        if (dataCache.getPlacedMachines() == null) return null;
+        
+        return dataCache.getPlacedMachines().get(location);
     }
 
     public Machine getMachine(String type) {

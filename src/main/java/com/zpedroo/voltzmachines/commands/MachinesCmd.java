@@ -29,6 +29,11 @@ public class MachinesCmd implements CommandExecutor {
             ItemStack item = null;
 
             switch (args[0].toUpperCase()) {
+                case "SHOP":
+                    if (player == null) return true;
+
+                    Menus.getInstance().openShopMenu(player);
+                    return true;
                 case "TOP":
                     if (player == null) return true;
 
@@ -63,7 +68,7 @@ public class MachinesCmd implements CommandExecutor {
                         return true;
                     }
 
-                    target.getInventory().addItem(machine.getItem(amount, 100));
+                    target.getInventory().addItem(machine.getItem(amount, BigInteger.valueOf(100)));
                     return true;
                 case "FUEL":
                     if (!sender.hasPermission("machines.admin")) break;
@@ -166,7 +171,7 @@ public class MachinesCmd implements CommandExecutor {
                         return true;
                     }
 
-                    target.getInventory().addItem(Items.getInstance().getRepair(percentage.intValue()));
+                    target.getInventory().addItem(Items.getInstance().getRepair(percentage));
                     return true;
                 case "INFINITE_REPAIR":
                     if (!sender.hasPermission("machines.admin")) break;
@@ -212,12 +217,12 @@ public class MachinesCmd implements CommandExecutor {
                         return true;
                     }
 
-                    target.getInventory().addItem(Items.getInstance().getGift());
+                    target.getInventory().addItem(Items.getInstance().getGift(target));
                     return true;
                 case "UPDATE":
                     if (!sender.hasPermission("machines.admin")) break;
 
-                    MachineManager.getInstance().updatePrices(true);
+                    MachineManager.updatePrices(true);
                     return true;
             }
         }
@@ -225,7 +230,7 @@ public class MachinesCmd implements CommandExecutor {
         if (player == null) return true;
 
         Menus.getInstance().openMainMenu(player);
-        player.playSound(player.getLocation(), Sound.ENTITY_HORSE_SADDLE, 0.5f, 10f);
+        player.playSound(player.getLocation(), Sound.HORSE_SADDLE, 0.5f, 10f);
         return false;
     }
 }
